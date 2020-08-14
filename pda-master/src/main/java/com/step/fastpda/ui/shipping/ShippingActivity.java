@@ -52,15 +52,6 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
             List<String> stringList=Splitter.on("%").splitToList(param);
             Thread handler = new Thread(new NetPostHandler(stringList));
             handler.start();
-
-
-
-//            if(apiResponse!=null&&apiResponse.body!=null){
-//                return (ShippingList) apiResponse.body;
-//            }
-
-
-            Toast.makeText(this,stringList.get(0),Toast.LENGTH_LONG).show();
         });
         AidcManager.create(this, new AidcManager.CreatedCallback() {
 
@@ -175,7 +166,11 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
                 ResponseInfo responseInfo= (ResponseInfo)apiResponse.body;
                 if(responseInfo.getCode().endsWith("200")){
                     handler.sendEmptyMessage(0);
+                }else{
+                    handler.sendEmptyMessage(1);
                 }
+            }else{
+                handler.sendEmptyMessage(1);
             }
 
         }
@@ -185,6 +180,8 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
         public void handleMessage(Message msg) {
             if(msg.what == 0){
                 Toast.makeText(ShippingActivity.this,"success",Toast.LENGTH_LONG).show();
+            }else{
+                Toast.makeText(ShippingActivity.this,"error",Toast.LENGTH_LONG).show();
             }
         }
     };

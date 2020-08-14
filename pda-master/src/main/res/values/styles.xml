@@ -15,7 +15,7 @@
 
     <style name="launcher" parent="AppTheme">
         <item name="android:windowFullscreen">true</item>
-        <item name="android:windowBackground">@drawable/splash</item>
+        <item name="android:windowBackground">@drawable/launcher_00</item>
     </style>
 
     <style name="preview" parent="AppTheme">
