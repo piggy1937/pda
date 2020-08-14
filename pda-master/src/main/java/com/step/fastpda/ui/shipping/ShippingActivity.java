@@ -7,6 +7,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.common.base.Splitter;
 import com.honeywell.aidc.AidcManager;
 import com.honeywell.aidc.BarcodeFailureEvent;
 import com.honeywell.aidc.BarcodeReadEvent;
@@ -18,6 +19,7 @@ import com.honeywell.aidc.UnsupportedPropertyException;
 import com.step.fastpda.databinding.ActivityLayoutShippingAddBinding;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,7 +43,8 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
         });
         mBinding.btnTinyShippingSubmit.setOnClickListener(e->{
             String param = mBinding.edShippingOrderSn.getText().toString();
-            Toast.makeText(this,param,Toast.LENGTH_LONG).show();
+            List<String> stringList=Splitter.on("%").splitToList(param);
+            Toast.makeText(this,stringList.get(0),Toast.LENGTH_LONG).show();
         });
         AidcManager.create(this, new AidcManager.CreatedCallback() {
 

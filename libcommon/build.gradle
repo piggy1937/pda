@@ -93,4 +93,8 @@ dependencies {
     api 'com.alibaba:fastjson:1.2.59'
 
     api 'com.joanzapata.iconify:android-iconify-fontawesome:2.2.2'
+    api 'com.google.guava:guava:24.0-android'
+}
+configurations {
+    all*.exclude group: 'com.google.guava', module: 'listenablefuture'
 }
