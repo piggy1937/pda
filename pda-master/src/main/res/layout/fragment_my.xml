@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="user"
+            type="com.step.fastpda.model.User" />
+
+
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.step.fastpda.view.PPImageView
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            app:blur_url="@{user.avatar}"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:radius="@{50}"
+            android:scaleType="fitXY"
+            android:background="@color/colorPrimary"></com.step.fastpda.view.PPImageView>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/action_logout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_16"
+            android:layout_marginRight="16dp"
+            android:fitsSystemWindows="true"
+            android:src="@drawable/icon_logout"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"></androidx.appcompat.widget.AppCompatImageView>
+
+        <com.step.fastpda.view.PPImageView
+            android:id="@+id/avatar"
+            android:layout_width="@dimen/dp_45"
+            android:layout_height="@dimen/dp_45"
+            android:layout_marginLeft="@dimen/dp_16"
+            android:layout_marginTop="75dp"
+            app:image_url="@{user.avatar}"
+            app:isCircle="@{true}"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:radius="@{0}"
+            tools:src="@mipmap/ic_launcher_round"></com.step.fastpda.view.PPImageView>
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp_10"
+            android:layout_marginTop="75dp"
+            android:text="@{user.name}"
+            android:textColor="@color/color_000"
+            android:textSize="@dimen/sp_16"
+            app:layout_constraintLeft_toRightOf="@+id/avatar"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="神秘的jetpack"></TextView>
+
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp_10"
+            android:layout_marginTop="@dimen/dp_6"
+            android:text="@{user.description}"
+            android:textColor="@color/color_999"
+            android:textSize="@dimen/sp_12"
+            app:layout_constraintLeft_toRightOf="@+id/avatar"
+            app:layout_constraintTop_toBottomOf="@+id/name"
+            tools:text="神秘的jetpack"></TextView>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/go_detail"
+            android:layout_width="@dimen/dp_30"
+            android:layout_height="@dimen/dp_30"
+            android:layout_marginTop="80dp"
+            android:layout_marginRight="@dimen/dp_10"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_right_arrow"
+            app:tint="@color/color_white">
+
+        </androidx.appcompat.widget.AppCompatImageView>
+
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_overlap"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_marginLeft="@dimen/dp_16"
+            android:layout_marginTop="180dp"
+            android:layout_marginRight="@dimen/dp_16"
+            android:background="@color/color_white"
+            app:cardCornerRadius="@dimen/dp_10"
+            app:cardPreventCornerOverlap="true"
+            app:cardUseCompatPadding="true"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_marginLeft="@dimen/dp_16"
+            android:layout_marginTop="@dimen/dimen_20"
+            android:layout_marginRight="@dimen/dp_16"
+            android:background="@color/color_white"
+            app:cardCornerRadius="@dimen/dp_10"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/card_overlap">
+
+        </androidx.cardview.widget.CardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

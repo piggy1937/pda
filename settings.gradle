@@ -1,0 +1,6 @@
+include ':libnavcompiler'
+include ':libnavannotation'
+include ':libcommon'
+include ':libnetwork'
+include ':pda-master'
+rootProject.name = 'pda'

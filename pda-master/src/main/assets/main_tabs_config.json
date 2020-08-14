@@ -1,0 +1,28 @@
+{
+  "activeColor": "#333333",
+  "inActiveColor": "#666666",
+  "selectTab": 0,
+  "tabs": [
+    {
+      "size": 24,
+      "enable": true,
+      "index": 0,
+      "pageUrl": "main/tabs/tiny",
+      "title": "小包"
+    },
+    {
+      "size": 24,
+      "enable": true,
+      "index": 1,
+      "pageUrl": "main/tabs/shipping",
+      "title": "唛头"
+    },
+    {
+      "size": 24,
+      "enable": true,
+      "index": 2,
+      "pageUrl": "main/tabs/my",
+      "title": "我的"
+    }
+  ]
+}
