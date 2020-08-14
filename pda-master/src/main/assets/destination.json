@@ -1,7 +1,7 @@
 {
   "main/tabs/tiny": {
     "isFragment": true,
-    "asStarter": false,
+    "asStarter": true,
     "needLogin": false,
     "pageUrl": "main/tabs/tiny",
     "className": "com.step.fastpda.ui.tinypack.TinyPackFragment",
@@ -17,7 +17,7 @@
   },
   "main/tabs/my": {
     "isFragment": true,
-    "asStarter": true,
+    "asStarter": false,
     "needLogin": false,
     "pageUrl": "main/tabs/my",
     "className": "com.step.fastpda.ui.my.MyFragment",
