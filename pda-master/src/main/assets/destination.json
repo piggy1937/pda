@@ -18,7 +18,7 @@
   "main/tabs/my": {
     "isFragment": true,
     "asStarter": false,
-    "needLogin": false,
+    "needLogin": true,
     "pageUrl": "main/tabs/my",
     "className": "com.step.fastpda.ui.my.MyFragment",
     "id": 1407657753

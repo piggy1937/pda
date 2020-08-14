@@ -1,5 +1,6 @@
 package com.step.fastpda.ui.login;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,11 +14,13 @@ import com.alibaba.fastjson.TypeReference;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.common.collect.Lists;
+import com.step.fastpda.MainActivity;
 import com.step.fastpda.R;
 import com.step.fastpda.model.User;
 import com.tech.libnetwork.ApiResponse;
 import com.tech.libnetwork.ApiService;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -81,9 +84,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
                 User user = new User();
                 Log.e("user",loginInfo.getUsername());
+                user.setExpires_time(new Date().getTime()+2*60*60*1000);
                 user.setName(loginInfo.getUsername());
                 UserManager.get().save(user);
-                finish();
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
             }
         }.execute(userName,password);
 
