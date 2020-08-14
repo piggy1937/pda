@@ -57,6 +57,9 @@
     <string name="api_host">服务器</string>
     <string name="edite">编辑</string>
     <string name="delete">删除</string>
+    <string name="tiny_pack">小码标签</string>
+    <string name="add_mini_pack_label">新增小包标签</string>
+    <string name="scan_lkd">扫描入库单</string>
 
     <string-array name="profile_tabs">
         <item>动态</item>

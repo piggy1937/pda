@@ -2,6 +2,8 @@ package com.step.fastpda;
 
 import android.app.Application;
 
+import com.joanzapata.iconify.Iconify;
+import com.joanzapata.iconify.fonts.FontAwesomeModule;
 import com.tech.libnetwork.ApiService;
 
 /**
@@ -13,6 +15,8 @@ public class PdaApp extends Application {
     public void onCreate() {
         super.onCreate();
         ApiService.init("https://www.fastmock.site/mock/16848d2a2b13c1bc0176b0e2b95ad6f6/api", null);
+        Iconify.with(new FontAwesomeModule());
+
 //        Pda.init(this)
 //                .withApiHost("http://192.168.20.44:5000/")
 //                .withInterceptor(MainInterceptor.get())

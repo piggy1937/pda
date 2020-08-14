@@ -24,7 +24,7 @@ import com.tech.libcommon.extention.AbsPagedListAdapter;
  * email： 604580436@qq.com
  * description：适配器-小包标签
  */
-public class TinyPackListAdapter  extends AbsPagedListAdapter<TinyPackList, TinyPackListAdapter.ViewHolder> {
+public class TinyPackListAdapter  extends AbsPagedListAdapter<TinyPackList, TinyPackListAdapter.ViewHolder>  {
     private LayoutInflater mInflater;
     private Context mContext;
 
@@ -95,7 +95,6 @@ public class TinyPackListAdapter  extends AbsPagedListAdapter<TinyPackList, Tiny
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private LayoutTinypackListItemBinding mItemBinding;
-
         public ViewHolder(@NonNull View itemView, LayoutTinypackListItemBinding itemBinding) {
             super(itemView);
             mItemBinding = itemBinding;

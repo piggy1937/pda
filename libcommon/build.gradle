@@ -92,5 +92,5 @@ dependencies {
     //fastjson解析
     api 'com.alibaba:fastjson:1.2.59'
 
-
+    api 'com.joanzapata.iconify:android-iconify-fontawesome:2.2.2'
 }
