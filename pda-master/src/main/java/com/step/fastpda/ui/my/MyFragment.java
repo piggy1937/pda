@@ -35,10 +35,12 @@ public class MyFragment extends Fragment {
     }
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
-        User user =new User();
-        user.setName("asdasdas");
-        mBinding.setUser(user);
 
+
+       User user= UserManager.get().getUser();
+       if(user!=null){
+           mBinding.setUser(user);
+       }
         UserManager.get().refresh().observe(this, newUser -> {
             if (newUser != null) {
                 mBinding.setUser(newUser);

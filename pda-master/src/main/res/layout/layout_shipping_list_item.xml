@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="@dimen/dimen_20"
-            android:text="@{shippingList.psnr}"
+            android:text="@{shippingList.inStockNo}"
             android:textColor="@color/color_000"
             android:textSize="16sp"
             app:layout_constraintLeft_toLeftOf="parent"

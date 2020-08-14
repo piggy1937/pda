@@ -1,12 +1,15 @@
 package com.step.fastpda.ui.shipping;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.alibaba.fastjson.TypeReference;
 import com.google.common.base.Splitter;
 import com.honeywell.aidc.AidcManager;
 import com.honeywell.aidc.BarcodeFailureEvent;
@@ -17,6 +20,9 @@ import com.honeywell.aidc.ScannerUnavailableException;
 import com.honeywell.aidc.TriggerStateChangeEvent;
 import com.honeywell.aidc.UnsupportedPropertyException;
 import com.step.fastpda.databinding.ActivityLayoutShippingAddBinding;
+import com.step.fastpda.ui.login.LoginInfo;
+import com.tech.libnetwork.ApiResponse;
+import com.tech.libnetwork.ApiService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +50,16 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
         mBinding.btnTinyShippingSubmit.setOnClickListener(e->{
             String param = mBinding.edShippingOrderSn.getText().toString();
             List<String> stringList=Splitter.on("%").splitToList(param);
+            Thread handler = new Thread(new NetPostHandler(stringList));
+            handler.start();
+
+
+
+//            if(apiResponse!=null&&apiResponse.body!=null){
+//                return (ShippingList) apiResponse.body;
+//            }
+
+
             Toast.makeText(this,stringList.get(0),Toast.LENGTH_LONG).show();
         });
         AidcManager.create(this, new AidcManager.CreatedCallback() {
@@ -138,4 +154,39 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
             mBarcodeReader = null;
         }
     }
+
+    class NetPostHandler implements Runnable {
+        private List<String> mParams;
+        public NetPostHandler(List<String> params) {
+            this.mParams=params;
+        }
+
+        @Override
+        public void run() {
+            ApiResponse apiResponse= ApiService.post("/login")
+                    .addParam("inStockNo",mParams.get(0))
+                    .addParam("inStockNumber",mParams.get(1))
+                    .addParam("sumQty",mParams.get(2))
+                    .addParam("stockNo",mParams.get(3))
+                    .addParam("position",mParams.get(4))
+                    .responseType(new TypeReference<ResponseInfo>(){}.getType())
+                    .execute();
+            if(apiResponse!=null&&apiResponse.body!=null){
+                ResponseInfo responseInfo= (ResponseInfo)apiResponse.body;
+                if(responseInfo.getCode().endsWith("200")){
+                    handler.sendEmptyMessage(0);
+                }
+            }
+
+        }
+    }
+    Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            if(msg.what == 0){
+                Toast.makeText(ShippingActivity.this,"success",Toast.LENGTH_LONG).show();
+            }
+        }
+    };
+
 }

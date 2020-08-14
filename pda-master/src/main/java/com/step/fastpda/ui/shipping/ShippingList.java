@@ -19,23 +19,23 @@ public class ShippingList extends BaseObservable implements Serializable {
     /***
      * 入库单号
      */
-    public String psnr;
+    public String inStockNo;
     /***
      * 单据序号
      */
-    public String pno;
+    public String inStockNumber;
     /***
      * 入库数量
      */
-    public Integer quantity;
+    public Integer sumQty;
     /***
      * 仓库号
      */
-    public Integer ckh;
+    public Integer stockNo;
     /***
      * 仓位号
      */
-    public Integer cwh;
+    public Integer position;
 
 
     @Override
@@ -45,6 +45,6 @@ public class ShippingList extends BaseObservable implements Serializable {
         }
         ShippingList newOne = (ShippingList) obj;
         return  id == newOne.id&&
-                TextUtils.equals(psnr, newOne.psnr)&&TextUtils.equals(pno, newOne.pno);
+                TextUtils.equals(inStockNo, newOne.inStockNo)&&TextUtils.equals(inStockNumber, newOne.inStockNumber);
     }
 }
