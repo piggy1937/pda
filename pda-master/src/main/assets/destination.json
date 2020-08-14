@@ -2,7 +2,7 @@
   "main/tabs/tiny": {
     "isFragment": true,
     "asStarter": true,
-    "needLogin": false,
+    "needLogin": true,
     "pageUrl": "main/tabs/tiny",
     "className": "com.step.fastpda.ui.tinypack.TinyPackFragment",
     "id": 1407657751
@@ -10,7 +10,7 @@
   "main/tabs/shipping": {
     "isFragment": true,
     "asStarter": false,
-    "needLogin": false,
+    "needLogin": true,
     "pageUrl": "main/tabs/shipping",
     "className": "com.step.fastpda.ui.shipping.ShippingFragment",
     "id": 1407657752
