@@ -36,4 +36,6 @@ dependencies {
     implementation project(':libnavannotation')
     //如果你使用kotlin,这里需要使用 kapt project
     annotationProcessor project(":libnavcompiler")
+    //添加material-dialogs依赖
+    implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
 }

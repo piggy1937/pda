@@ -1,6 +1,8 @@
 package com.step.fastpda.ui.tinypack;
 
 import android.content.Context;
+import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.step.fastpda.R;
 import com.step.fastpda.databinding.LayoutTinypackListItemBinding;
 import com.tech.libcommon.extention.AbsPagedListAdapter;
 
@@ -44,6 +49,39 @@ public class TinyPackListAdapter  extends AbsPagedListAdapter<TinyPackList, Tiny
     @Override
     protected ViewHolder onCreateViewHolder2(ViewGroup parent, int viewType) {
         LayoutTinypackListItemBinding itemBinding = LayoutTinypackListItemBinding.inflate(mInflater, parent, false);
+        itemBinding.tvDelete.setOnClickListener(v->new MaterialDialog.Builder(mContext)
+                .title("删除")
+                .content("确定要删除"+itemBinding.tvTinypackTitle.getText()+"吗?")
+                .positiveText("确认")
+                .negativeText("取消").onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                      dialog.dismiss();
+                    }
+                }).show());
+
+        itemBinding.tvEdite.setOnClickListener(v->new MaterialDialog.Builder(mContext)
+                .title(itemBinding.tvTinypackTitle.getText())
+                .inputRangeRes(1, 20, R.color.colorAccent)
+                //限制输入类型
+                .inputType(InputType.TYPE_CLASS_NUMBER)
+                .input("数量", null, new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(MaterialDialog dialog, CharSequence input) {
+                        Log.e("",input.toString());
+                    }
+                })
+                .positiveText("确定").onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                    }
+                })
+                .negativeText("取消")
+                .show());
+
+
+
         return new ViewHolder(itemBinding.getRoot(), itemBinding);
     }
 

@@ -5,7 +5,7 @@ import androidx.paging.PagedList;
 import androidx.paging.PagedListAdapter;
 
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
-import com.step.fastpda.ui.AbsListFragment;
+import com.step.fastpda.ui.AbsListFragment2;
 import com.tech.libnavannotation.FragmentDestination;
 
 /**
@@ -16,7 +16,7 @@ import com.tech.libnavannotation.FragmentDestination;
  * description： 小包标签
  */
 @FragmentDestination(pageUrl = "main/tabs/tiny")
-public class TinyPackFragment extends AbsListFragment<TinyPackList,TinyPackViewModel> {
+public class TinyPackFragment extends AbsListFragment2<TinyPackList,TinyPackViewModel> {
 
     @Override
     public PagedListAdapter getAdapter() {

@@ -29,7 +29,7 @@ public class ShippingListAdapter extends AbsPagedListAdapter<ShippingList, Shipp
 
             @Override
             public boolean areItemsTheSame(@NonNull ShippingList oldItem, @NonNull ShippingList newItem) {
-                return true;
+                return oldItem.id == newItem.id;
             }
 
             @Override

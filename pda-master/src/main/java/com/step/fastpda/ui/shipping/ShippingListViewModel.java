@@ -51,7 +51,7 @@ public class ShippingListViewModel extends AbsViewModel<ShippingList> {
         @NonNull
         @Override
         public Long getKey(@NonNull ShippingList item) {
-            return null;
+          return item.id;
         }
     }
     private void loadData(Long requestKey, ItemKeyedDataSource.LoadCallback<ShippingList> callback) {

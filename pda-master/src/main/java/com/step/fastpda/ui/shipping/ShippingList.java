@@ -15,6 +15,7 @@ import java.io.Serializable;
  * description： 唛头
  */
 public class ShippingList extends BaseObservable implements Serializable {
+    public Long id ;
     /***
      * 入库单号
      */
@@ -43,6 +44,7 @@ public class ShippingList extends BaseObservable implements Serializable {
             return false;
         }
         ShippingList newOne = (ShippingList) obj;
-        return TextUtils.equals(psnr, newOne.psnr)&&TextUtils.equals(pno, newOne.pno);
+        return  id == newOne.id&&
+                TextUtils.equals(psnr, newOne.psnr)&&TextUtils.equals(pno, newOne.pno);
     }
 }
