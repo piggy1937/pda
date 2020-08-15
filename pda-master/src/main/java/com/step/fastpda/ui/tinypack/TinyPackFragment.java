@@ -25,6 +25,7 @@ import com.tech.libnavannotation.FragmentDestination;
  */
 @FragmentDestination(pageUrl = "main/tabs/tiny")
 public class TinyPackFragment extends AbsListFragment2<TinyPackList,TinyPackViewModel> {
+    private static final int REQUEST_CODE = 100;
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -33,7 +34,7 @@ public class TinyPackFragment extends AbsListFragment2<TinyPackList,TinyPackView
 
         headerBinding.actionTinyPackAdd.setOnClickListener(v->{
             Intent intent = new Intent(getContext(),TinyPackAddActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent,REQUEST_CODE);
         });
 
     }
@@ -53,5 +54,14 @@ public class TinyPackFragment extends AbsListFragment2<TinyPackList,TinyPackView
     @Override
     public void onRefresh(@NonNull RefreshLayout refreshLayout) {
         mViewModel.getDataSource().invalidate();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==REQUEST_CODE&&resultCode==200){
+            mViewModel.getDataSource().invalidate();
+        }
+
     }
 }

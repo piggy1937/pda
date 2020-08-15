@@ -21,6 +21,7 @@ import com.honeywell.aidc.TriggerStateChangeEvent;
 import com.honeywell.aidc.UnsupportedPropertyException;
 import com.step.fastpda.databinding.ActivityLayoutShippingAddBinding;
 import com.step.fastpda.ui.login.LoginInfo;
+import com.step.fastpda.utils.StatusBar;
 import com.tech.libnetwork.ApiResponse;
 import com.tech.libnetwork.ApiService;
 
@@ -36,15 +37,19 @@ import java.util.Map;
  * description：
  */
 public class ShippingActivity extends AppCompatActivity implements  BarcodeReader.BarcodeListener, BarcodeReader.TriggerListener{
+    private static final int RESULT_CODE = 200;
     private ActivityLayoutShippingAddBinding mBinding;
     private BarcodeReader mBarcodeReader;
     private String mLastModifyTime;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        StatusBar.lightStatusBar(this, false);
         mBinding = ActivityLayoutShippingAddBinding.inflate(LayoutInflater.from(this));
         setContentView(mBinding.getRoot());
+        //关闭对话框
         mBinding.iconShippingClose.setOnClickListener(e->{
+            setResult(RESULT_CODE);
             finish();
         });
         mBinding.btnTinyShippingSubmit.setOnClickListener(e->{
@@ -62,6 +67,7 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
             }
         });
     }
+
     /***
      * 初始化barcode
      * @param barcodeReader
@@ -132,7 +138,27 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
             Toast.makeText(this, "Scanner unavailable", Toast.LENGTH_SHORT).show();
         }
     }
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mBarcodeReader != null) {
+            try {
+                mBarcodeReader.claim();
+            } catch (ScannerUnavailableException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Scanner unavailable", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mBarcodeReader != null) {
+            // release the scanner claim so we don't get any scanner
+            // notifications while paused.
+            mBarcodeReader.release();
+        }
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -144,6 +170,8 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
             mBarcodeReader.close();
             mBarcodeReader = null;
         }
+       StatusBar.lightStatusBar(this, true);
+
     }
 
     class NetPostHandler implements Runnable {

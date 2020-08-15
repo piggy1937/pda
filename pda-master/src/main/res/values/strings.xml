@@ -54,12 +54,16 @@
     <string name="fragment_my_logout">确定要继续退出吗？</string>
     <string name="fragment_my_logout_ok">确定</string>
     <string name="fragment_my_logout_cancel">取消</string>
-    <string name="api_host">服务器</string>
+    <string name="api_host">请输入地址非必填</string>
     <string name="edite">编辑</string>
     <string name="delete">删除</string>
     <string name="tiny_pack">小码标签</string>
     <string name="add_mini_pack_label">新增小包标签</string>
     <string name="scan_lkd">扫描入库单</string>
+    <string name="text_attach">补打</string>
+    <string name="save">保存</string>
+    <string name="text_bar">标签号</string>
+    <string name="text_number">数量</string>
 
     <string-array name="profile_tabs">
         <item>动态</item>

@@ -1,5 +1,6 @@
 package com.step.fastpda.ui.tinypack;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.widget.Toast;
@@ -7,6 +8,8 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.honeywell.aidc.AidcManager;
 import com.honeywell.aidc.BarcodeFailureEvent;
 import com.honeywell.aidc.BarcodeReadEvent;
@@ -16,8 +19,20 @@ import com.honeywell.aidc.ScannerUnavailableException;
 import com.honeywell.aidc.TriggerStateChangeEvent;
 import com.honeywell.aidc.UnsupportedPropertyException;
 import com.step.fastpda.databinding.ActivityLayoutTinypackAddBinding;
+import com.step.fastpda.ui.login.UserManager;
+import com.step.fastpda.ui.shipping.ResponseInfo;
+import com.step.fastpda.utils.StatusBar;
+import com.tech.libcommon.global.CallbackManager;
+import com.tech.libcommon.global.CallbackType;
+import com.tech.libcommon.global.IGlobalCallback;
+import com.tech.libnetwork.ApiResponse;
+import com.tech.libnetwork.ApiService;
+import com.tech.libnetwork.JsonCallback;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,16 +43,24 @@ import java.util.Map;
  * description：
  */
 public class TinyPackAddActivity extends AppCompatActivity implements  BarcodeReader.BarcodeListener, BarcodeReader.TriggerListener{
+    private static final int RESULT_CODE = 200;
     private ActivityLayoutTinypackAddBinding mBinding;
     private BarcodeReader mBarcodeReader;
     private String mLastModifyTime;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        StatusBar.lightStatusBar(this, false);
         mBinding= ActivityLayoutTinypackAddBinding.inflate(LayoutInflater.from(this));
         setContentView(mBinding.getRoot());
         mBinding.iconTinyPackClose.setOnClickListener(e->{
+            setResult(RESULT_CODE);
             finish();
+        });
+
+
+        mBinding.btnTinyPackSubmit.setOnClickListener(e->{
+            insertTinyPack();
         });
 
         AidcManager.create(this, new AidcManager.CreatedCallback() {
@@ -49,6 +72,29 @@ public class TinyPackAddActivity extends AppCompatActivity implements  BarcodeRe
             }
         });
 
+
+
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mBarcodeReader != null) {
+            try {
+                mBarcodeReader.claim();
+            } catch (ScannerUnavailableException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Scanner unavailable", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mBarcodeReader != null) {
+            // release the scanner claim so we don't get any scanner
+            // notifications while paused.
+            mBarcodeReader.release();
+        }
     }
 
     @Override
@@ -62,6 +108,7 @@ public class TinyPackAddActivity extends AppCompatActivity implements  BarcodeRe
             mBarcodeReader.close();
             mBarcodeReader = null;
         }
+        StatusBar.lightStatusBar(this, true);
     }
 
     @Override
@@ -133,4 +180,53 @@ public class TinyPackAddActivity extends AppCompatActivity implements  BarcodeRe
         // Apply the settings
         barcodeReader.setProperties(properties);
     }
+
+    /***
+     * 新增小包标签
+     */
+    private void insertTinyPack(){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        String type="normal";
+        if(mBinding.cbTinyPackAttach.isChecked()){
+            type ="attach";
+        }
+        String barcode=mBinding.edPackingSn.getText().toString();
+        String txtSL = mBinding.edPackingQuantity.getText().toString();
+        ApiService.post("/tinypack")
+                .addParam("barcode", barcode)
+                .addParam("txtSL",txtSL)
+                .addParam("creator",UserManager.get().getUser().getName())
+                .addParam("type", type)
+                .responseType(new TypeReference<ArrayList<ResponseInfo>>() {
+                }.getType())
+                .execute(new JsonCallback<JSONObject>() {
+                    @Override
+                    public void onSuccess(ApiResponse<JSONObject> response) {
+                        super.onSuccess(response);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mBinding.edPackingQuantity.setText("0");
+                                mBinding.edPackingSn.setText("");
+                                mBinding.edPackingSn.requestFocus();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(ApiResponse<JSONObject> response) {
+                        super.onError(response);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mBinding.edPackingQuantity.setText("0");
+                                mBinding.edPackingSn.setText("");
+                                mBinding.edPackingSn.requestFocus();
+                                Toast.makeText(TinyPackAddActivity.this, response.message, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                });
+    }
+
 }

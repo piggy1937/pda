@@ -58,7 +58,7 @@ public class TinyPackViewModel extends AbsViewModel<TinyPackList> {
         if (requestKey > 0) {
             loadAfter.set(true);
         }
-        ApiResponse<List<TinyPackList>> response = ApiService.get("/tiny/page")
+        ApiResponse<List<TinyPackList>> response = ApiService.get("/tinypack/page")
                 .addParam("userId", UserManager.get().getUserId())
                 .addParam("pageSize", 10)
                 .addParam("offset", offset)

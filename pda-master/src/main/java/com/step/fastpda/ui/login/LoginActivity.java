@@ -87,6 +87,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 user.setExpires_time(new Date().getTime()+2*60*60*1000);
                 user.setName(loginInfo.getUsername());
                 UserManager.get().save(user);
+                String apiHost=mApiHost.getText().toString();
+                if(apiHost!=null&&!apiHost.isEmpty()){
+                    ApiService.init(apiHost.toString(),null);
+                }
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
             }
