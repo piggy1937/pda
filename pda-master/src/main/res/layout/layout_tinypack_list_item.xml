@@ -22,14 +22,14 @@
             android:paddingBottom="12dp">
 
             <TextView
-                android:id="@+id/tv_quantity"
+                android:id="@+id/tv_tinypack_quantity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_marginStart="2dp"
                 android:layout_marginLeft="2dp"
-                android:text="@{tinyPackList.quantity>0?String.valueOf(tinyPackList.quantity):'0'}"
+                android:text="@{tinyPackList.quantity>0?String.valueOf(tinyPackList.quantity):String.valueOf(0)}"
                 android:textColor="#FF34393F"
                 android:textSize="14sp" />
 
@@ -37,14 +37,14 @@
                 android:id="@+id/tv_tinypack_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_toStartOf="@id/tv_quantity"
-                android:layout_toLeftOf="@id/tv_quantity"
-                android:text="@{tinyPackList.Barcode}"
+                android:layout_toStartOf="@id/tv_tinypack_quantity"
+                android:layout_toLeftOf="@id/tv_tinypack_quantity"
+                android:text="@{tinyPackList.barcode}"
                 android:textColor="#FF34393F"
                 android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/tv__tinypack_last_modify_time"
+                android:id="@+id/tv_tinypack_last_modify_time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tv_tinypack_title"
@@ -59,7 +59,7 @@
                 android:id="@+id/tv_volume"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@id/tv__tinypack_last_modify_time"
+                android:layout_alignBottom="@id/tv_tinypack_last_modify_time"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_marginStart="2dp"
@@ -72,7 +72,7 @@
                     android:layout_height="match_parent">
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tv_edite"
+                        android:id="@+id/tv_tinypack_edite"
                         android:layout_width="60dp"
                         android:layout_height="match_parent"
                         android:background="#2E9AFE"
@@ -84,7 +84,7 @@
                         android:textSize="14sp" />
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tv_delete"
+                        android:id="@+id/tv_tinypack_delete"
                         android:layout_width="60dp"
                         android:layout_height="match_parent"
                         android:background="#FFF55030"

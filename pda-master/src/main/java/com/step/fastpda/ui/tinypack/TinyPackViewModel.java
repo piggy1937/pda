@@ -5,13 +5,14 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.paging.ItemKeyedDataSource;
 
 import com.alibaba.fastjson.TypeReference;
+import com.google.common.collect.Lists;
 import com.step.fastpda.ui.AbsViewModel;
 import com.tech.libnetwork.ApiResponse;
 import com.tech.libnetwork.ApiService;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -61,17 +62,28 @@ public class TinyPackViewModel extends AbsViewModel<TinyPackList> {
         SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
         Integer pageSize = 10;
         Integer pageIndex=(offset+pageSize)/pageSize;
-        ApiResponse<List<TinyPackList>> response = ApiService.get("/Data/GetBarcode")
+        ApiResponse<TinyPackResponseInfo> response = ApiService.get("/Data/GetBarcode")
                 .addParam("pageSize", pageSize)
 //                .addParam("RwDate",sdf.format(new Date()))
 //                .addParam("pageSize", 10)
                 .addParam("pageIndex", pageIndex)
-                .responseType(new TypeReference<ArrayList<TinyPackList>>() {
+                .responseType(new TypeReference<TinyPackResponseInfo>() {
                 }.getType())
                 .execute();
-
-        List<TinyPackList> result = response.body == null ? Collections.emptyList() : response.body;
-        callback.onResult(result);
+        List<TinyPackList> result= Lists.newArrayList();
+        TinyPackResponseInfo tinyPackResponseInfos = response.body == null ?null: response.body;
+        if(tinyPackResponseInfos!=null&&tinyPackResponseInfos.getBarcodelist()!=null) {
+            for(TinyPackResponseInfo.BarcodelistBean bean:tinyPackResponseInfos.getBarcodelist()){
+                TinyPackList entity = new TinyPackList();
+                entity.setId(bean.getId());
+                entity.setBarcode(bean.getBarcode());
+                entity.setLastModifyTime(new Date());
+                entity.setQuantity(0);
+                entity.setTitle("");
+                result.add(entity);
+            }
+            callback.onResult(result);
+        }
         if (requestKey > 0) {
             loadAfter.set(false);
             offset += result.size();

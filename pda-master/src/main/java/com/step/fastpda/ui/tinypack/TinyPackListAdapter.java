@@ -49,7 +49,7 @@ public class TinyPackListAdapter  extends AbsPagedListAdapter<TinyPackList, Tiny
     @Override
     protected ViewHolder onCreateViewHolder2(ViewGroup parent, int viewType) {
         LayoutTinypackListItemBinding itemBinding = LayoutTinypackListItemBinding.inflate(mInflater, parent, false);
-        itemBinding.tvDelete.setOnClickListener(v->new MaterialDialog.Builder(mContext)
+        itemBinding.tvTinypackDelete.setOnClickListener(v->new MaterialDialog.Builder(mContext)
                 .title("删除")
                 .content("确定要删除"+itemBinding.tvTinypackTitle.getText()+"吗?")
                 .positiveText("确认")
@@ -60,7 +60,7 @@ public class TinyPackListAdapter  extends AbsPagedListAdapter<TinyPackList, Tiny
                     }
                 }).show());
 
-        itemBinding.tvEdite.setOnClickListener(v->new MaterialDialog.Builder(mContext)
+        itemBinding.tvTinypackEdite.setOnClickListener(v->new MaterialDialog.Builder(mContext)
                 .title(itemBinding.tvTinypackTitle.getText())
                 .inputRangeRes(1, 20, R.color.colorAccent)
                 //限制输入类型

@@ -9,7 +9,7 @@ import java.io.Serializable;
  * email： 604580436@qq.com
  * description：
  */
-public class BaseResponse implements Serializable {
+public class BaseResponseInfo implements Serializable {
     private String  errCode;
     private String  errMsg;
 

@@ -20,7 +20,7 @@ public class TinyPackList extends BaseObservable implements Serializable {
     /***
      * 编号
      */
-    public String Barcode;
+    public String barcode;
     /***
      * 标题
      */
@@ -37,9 +37,47 @@ public class TinyPackList extends BaseObservable implements Serializable {
         }
         TinyPackList newOne = (TinyPackList) obj;
         return id == newOne.id
-                && TextUtils.equals(Barcode, newOne.Barcode)
+                && TextUtils.equals(barcode, newOne.barcode)
                 && TextUtils.equals(title, newOne.title);
     }
 
+    public Long getId() {
+        return id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getBarcode() {
+        return barcode;
+    }
+
+    public void setBarcode(String barcode) {
+        this.barcode = barcode;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    public Date getLastModifyTime() {
+        return lastModifyTime;
+    }
+
+    public void setLastModifyTime(Date lastModifyTime) {
+        this.lastModifyTime = lastModifyTime;
+    }
 }
