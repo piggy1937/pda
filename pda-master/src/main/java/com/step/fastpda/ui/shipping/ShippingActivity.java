@@ -191,7 +191,7 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
                     .execute();
             if(apiResponse!=null&&apiResponse.body!=null){
                 ResponseInfo responseInfo= (ResponseInfo)apiResponse.body;
-                if(responseInfo.getCode().endsWith("200")){
+                if(responseInfo!=null&&responseInfo.getCode()!=null&&responseInfo.getCode().endsWith("200")){
                     handler.sendEmptyMessage(0);
                 }else{
                     handler.sendEmptyMessage(1);

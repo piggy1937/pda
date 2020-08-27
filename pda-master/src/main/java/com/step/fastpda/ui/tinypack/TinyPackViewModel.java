@@ -12,7 +12,6 @@ import com.tech.libnetwork.ApiService;
 
 import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -77,8 +76,8 @@ public class TinyPackViewModel extends AbsViewModel<TinyPackList> {
                 TinyPackList entity = new TinyPackList();
                 entity.setId(bean.getId());
                 entity.setBarcode(bean.getBarcode());
-                entity.setLastModifyTime(new Date());
-                entity.setQuantity(0);
+                entity.setLastModifyTime(bean.getLastModifyTime());
+                entity.setQuantity(bean.getQuantity());
                 entity.setTitle("");
                 result.add(entity);
             }

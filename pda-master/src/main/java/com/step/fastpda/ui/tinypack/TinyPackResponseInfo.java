@@ -2,6 +2,7 @@ package com.step.fastpda.ui.tinypack;
 
 import com.step.fastpda.ui.login.BaseResponseInfo;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -37,7 +38,11 @@ public class TinyPackResponseInfo extends BaseResponseInfo {
          */
         private Long id;
         private String barcode;
-
+        public Integer quantity;
+        /***
+         * 最近修改时间
+         */
+        public Date lastModifyTime;
         public Long getId() {
             return id;
         }
@@ -52,6 +57,22 @@ public class TinyPackResponseInfo extends BaseResponseInfo {
 
         public void setBarcode(String barcode) {
             this.barcode = barcode;
+        }
+
+        public Integer getQuantity() {
+            return quantity;
+        }
+
+        public void setQuantity(Integer quantity) {
+            this.quantity = quantity;
+        }
+
+        public Date getLastModifyTime() {
+            return lastModifyTime;
+        }
+
+        public void setLastModifyTime(Date lastModifyTime) {
+            this.lastModifyTime = lastModifyTime;
         }
     }
 }

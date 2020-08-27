@@ -7,7 +7,6 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.honeywell.aidc.AidcManager;
 import com.honeywell.aidc.BarcodeFailureEvent;
@@ -18,15 +17,14 @@ import com.honeywell.aidc.ScannerUnavailableException;
 import com.honeywell.aidc.TriggerStateChangeEvent;
 import com.honeywell.aidc.UnsupportedPropertyException;
 import com.step.fastpda.databinding.ActivityLayoutTinypackAddBinding;
+import com.step.fastpda.ui.login.BaseResponseInfo;
 import com.step.fastpda.ui.login.UserManager;
-import com.step.fastpda.ui.shipping.ResponseInfo;
 import com.step.fastpda.utils.StatusBar;
 import com.tech.libnetwork.ApiResponse;
 import com.tech.libnetwork.ApiService;
 import com.tech.libnetwork.JsonCallback;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -192,34 +190,49 @@ public class TinyPackAddActivity extends AppCompatActivity implements  BarcodeRe
                 .addParam("txtSL",txtSL)
                 .addParam("creator",UserManager.get().getUser().getName())
                 .addParam("type", type)
-                .responseType(new TypeReference<ArrayList<ResponseInfo>>() {
+                .responseType(new TypeReference<BaseResponseInfo>() {
                 }.getType())
-                .execute(new JsonCallback<JSONObject>() {
+                .execute(new JsonCallback<BaseResponseInfo>() {
                     @Override
-                    public void onSuccess(ApiResponse<JSONObject> response) {
+                    public void onSuccess(ApiResponse<BaseResponseInfo> response) {
                         super.onSuccess(response);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mBinding.edPackingQuantity.setText("0");
-                                mBinding.edPackingSn.setText("");
-                                mBinding.edPackingSn.requestFocus();
+                        BaseResponseInfo baseResponseInfo = response.body!=null?response.body:null;
+                        if(baseResponseInfo!=null&&baseResponseInfo.getErrCode().equals("1")) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mBinding.edPackingQuantity.setText("0");
+                                    mBinding.edPackingSn.setText("");
+                                    mBinding.edPackingSn.requestFocus();
+                                }
+                            });
+                        }else{
+                            if(baseResponseInfo!=null) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                         Toast.makeText(TinyPackAddActivity.this, baseResponseInfo.getErrMsg(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                             }
-                        });
+                        }
                     }
 
                     @Override
-                    public void onError(ApiResponse<JSONObject> response) {
+                    public void onError(ApiResponse<BaseResponseInfo> response) {
                         super.onError(response);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mBinding.edPackingQuantity.setText("0");
-                                mBinding.edPackingSn.setText("");
-                                mBinding.edPackingSn.requestFocus();
-                                Toast.makeText(TinyPackAddActivity.this, response.message, Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        BaseResponseInfo baseResponseInfo = response.body!=null?response.body:null;
+                        if(baseResponseInfo!=null&&!baseResponseInfo.getErrCode().equals("1")) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mBinding.edPackingQuantity.setText("0");
+                                    mBinding.edPackingSn.setText("");
+                                    mBinding.edPackingSn.requestFocus();
+                                    Toast.makeText(TinyPackAddActivity.this, baseResponseInfo.getErrMsg(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
                     }
                 });
     }
