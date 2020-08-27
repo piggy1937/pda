@@ -44,7 +44,7 @@
                         android:layout_height="wrap_content"
                         android:background="@color/cardview_light_background"
                         android:hint="@string/api_host"
-                        android:text="http://114.88.75.45:1234"
+                        android:text=""
                         android:inputType="textEmailAddress"
                         tools:ignore="HardcodedText" />
                 </com.google.android.material.textfield.TextInputLayout>

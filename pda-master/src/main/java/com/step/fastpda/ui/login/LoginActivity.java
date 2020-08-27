@@ -21,6 +21,7 @@ import com.joanzapata.iconify.fonts.FontAwesomeIcons;
 import com.step.fastpda.MainActivity;
 import com.step.fastpda.R;
 import com.step.fastpda.model.User;
+import com.step.fastpda.utils.PreferenceUtils;
 import com.tech.libnetwork.ApiResponse;
 import com.tech.libnetwork.ApiService;
 
@@ -91,6 +92,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         mApiHost= findViewById(R.id.edit_sign_in_host);
         actionLogin= findViewById(R.id.action_login);
         actionLogin.setOnClickListener(this);
+
+        String sUsername= PreferenceUtils.getString(LoginActivity.this,"USER_NAME","");
+        String sPassword= PreferenceUtils.getString(LoginActivity.this,"PASSWORD","");
+        String sApiHost= PreferenceUtils.getString(LoginActivity.this,"API_HOST","http://114.88.75.45:1234");
+        mUsername.setText(sUsername);
+        mPassword.setText(sPassword);
+        mApiHost.setText(sApiHost);
     }
     @Override
     public void onClick(View v) {
@@ -142,6 +150,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 if(apiHost!=null&&!apiHost.isEmpty()){
                     ApiService.init(apiHost.toString(),null);
                 }
+                PreferenceUtils.putString(LoginActivity.this,"USER_NAME", userName);
+                PreferenceUtils.putString(LoginActivity.this,"PASSWORD", password);
+                PreferenceUtils.putString(LoginActivity.this,"API_HOST", apiHost);
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
             }
