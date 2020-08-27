@@ -17,6 +17,7 @@
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.auto.service/auto-service-annotations/1.0-rc6/32c6a6313217c949396376d9caddb6b8c8f4e7c3/auto-service-annotations-1.0-rc6.jar" />
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.errorprone/error_prone_annotations/2.2.0/88e3c593e9b3586e1c6177f89267da6fc6986f0c/error_prone_annotations-2.2.0.jar" />
         </processorPath>
+        <module name="pda-libnavcompiler" />
       </profile>
     </annotationProcessing>
   </component>

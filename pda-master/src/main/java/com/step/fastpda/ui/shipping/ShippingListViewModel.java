@@ -6,10 +6,10 @@ import androidx.paging.ItemKeyedDataSource;
 
 import com.alibaba.fastjson.TypeReference;
 import com.step.fastpda.ui.AbsViewModel;
-import com.step.fastpda.ui.login.UserManager;
 import com.tech.libnetwork.ApiResponse;
 import com.tech.libnetwork.ApiService;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -58,10 +58,14 @@ public class ShippingListViewModel extends AbsViewModel<ShippingList> {
         if (requestKey > 0) {
             loadAfter.set(true);
         }
-        ApiResponse<List<ShippingList>> response = ApiService.get("/shipping/page")
-                .addParam("userId", UserManager.get().getUserId())
-                .addParam("pageSize", 10)
-                .addParam("offset", offset)
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+        Integer pageSize = 10;
+        Integer pageIndex=(offset+pageSize)/pageSize;
+        ApiResponse<List<ShippingList>> response = ApiService.get("/Data/GetBarcodemt")
+//                .addParam("creater", UserManager.get().getUserId())
+//                .addParam("RwDate",sdf.format(new Date()))
+                .addParam("pageSize", pageSize)
+                .addParam("pageIndex", pageIndex)
                 .responseType(new TypeReference<ArrayList<ShippingList>>() {
                 }.getType())
                 .execute();

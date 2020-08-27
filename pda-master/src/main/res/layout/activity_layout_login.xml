@@ -30,7 +30,7 @@
                     android:layout_height="150dp"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginBottom="18dp"
-                    android:src="@drawable/ic_launcher" />
+                    android:src="@mipmap/logo" />
                 <!--           服务端-->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
@@ -44,7 +44,7 @@
                         android:layout_height="wrap_content"
                         android:background="@color/cardview_light_background"
                         android:hint="@string/api_host"
-                        android:text=""
+                        android:text="http://kidneycrm.gicp.net:1234"
                         android:inputType="textEmailAddress"
                         tools:ignore="HardcodedText" />
                 </com.google.android.material.textfield.TextInputLayout>

@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:layout_toStartOf="@id/tv_quantity"
                 android:layout_toLeftOf="@id/tv_quantity"
-                android:text="@{tinyPackList.title}"
+                android:text="@{tinyPackList.Barcode}"
                 android:textColor="#FF34393F"
                 android:textSize="14sp" />
 

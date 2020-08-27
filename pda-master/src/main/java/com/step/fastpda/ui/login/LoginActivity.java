@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.alibaba.fastjson.TypeReference;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.common.collect.Lists;
 import com.step.fastpda.MainActivity;
 import com.step.fastpda.R;
 import com.step.fastpda.model.User;
@@ -21,7 +20,8 @@ import com.tech.libnetwork.ApiResponse;
 import com.tech.libnetwork.ApiService;
 
 import java.util.Date;
-import java.util.List;
+
+import static com.tech.libnetwork.Request.NET_ONLY;
 
 /**
  * @author zhushubin
@@ -59,17 +59,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void login() {
         String userName=mUsername.getText().toString();
         String password=mPassword.getText().toString();
-        new AsyncTask<String, Void, LoginInfo>() {
+        new AsyncTask<String, Void, BaseResponse>() {
             //该方法运行在后台线程中，因此不能在该线程中更新UI，UI线程为主线程
             @Override
-            protected LoginInfo doInBackground(String... params) {
-                ApiResponse apiResponse= ApiService.post("/login")
+            protected BaseResponse doInBackground(String... params) {
+                ApiResponse apiResponse= ApiService.post("/Data/Login")
+                        .cacheStrategy(NET_ONLY)
                         .addParam("username",params[0])
                         .addParam("password",params[1])
-                        .responseType(new TypeReference<LoginInfo>(){}.getType())
+                        .responseType(new TypeReference<BaseResponse>(){}.getType())
                         .execute();
                 if(apiResponse!=null&&apiResponse.body!=null){
-                    return (LoginInfo) apiResponse.body;
+                    return (BaseResponse) apiResponse.body;
                 }
                 return null;
             }
@@ -77,15 +78,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             //在doInBackground 执行完成后，onPostExecute 方法将被UI 线程调用，
             // 后台的计算结果将通过该方法传递到UI线程，并且在界面上展示给用户.
             @Override
-            protected void onPostExecute(LoginInfo loginInfo) {
-                if(loginInfo==null){
+            protected void onPostExecute(BaseResponse responseInfo) {
+                if(responseInfo==null){
                     Toast.makeText(LoginActivity.this,"用户名密码错误",Toast.LENGTH_LONG).show();
                     return;
                 }
+                if(responseInfo.getErrCode().equals("1")){
+                    Log.e("user",userName);
+                }
                 User user = new User();
-                Log.e("user",loginInfo.getUsername());
+
                 user.setExpires_time(new Date().getTime()+2*60*60*1000);
-                user.setName(loginInfo.getUsername());
+                user.setName(userName);
                 UserManager.get().save(user);
                 String apiHost=mApiHost.getText().toString();
                 if(apiHost!=null&&!apiHost.isEmpty()){

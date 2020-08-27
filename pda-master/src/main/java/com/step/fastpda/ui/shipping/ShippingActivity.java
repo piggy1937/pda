@@ -20,7 +20,6 @@ import com.honeywell.aidc.ScannerUnavailableException;
 import com.honeywell.aidc.TriggerStateChangeEvent;
 import com.honeywell.aidc.UnsupportedPropertyException;
 import com.step.fastpda.databinding.ActivityLayoutShippingAddBinding;
-import com.step.fastpda.ui.login.LoginInfo;
 import com.step.fastpda.utils.StatusBar;
 import com.tech.libnetwork.ApiResponse;
 import com.tech.libnetwork.ApiService;
@@ -182,7 +181,7 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
 
         @Override
         public void run() {
-            ApiResponse apiResponse= ApiService.post("/login")
+            ApiResponse apiResponse= ApiService.post("/Data/ParsebarcodeMT")
                     .addParam("inStockNo",mParams.get(0))
                     .addParam("inStockNumber",mParams.get(1))
                     .addParam("sumQty",mParams.get(2))

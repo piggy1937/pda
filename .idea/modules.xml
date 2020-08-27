@@ -2,11 +2,17 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/fastpda-pda.iml" filepath="$PROJECT_DIR$/.idea/modules/fastpda-pda.iml" group="pda" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/pda-master/fastpda-pda-master.iml" filepath="$PROJECT_DIR$/.idea/modules/pda-master/fastpda-pda-master.iml" group="pda/pda-master" />
       <module fileurl="file://$PROJECT_DIR$/libcommon/libcommon.iml" filepath="$PROJECT_DIR$/libcommon/libcommon.iml" />
       <module fileurl="file://$PROJECT_DIR$/libnavannotation/libnavannotation.iml" filepath="$PROJECT_DIR$/libnavannotation/libnavannotation.iml" />
       <module fileurl="file://$PROJECT_DIR$/libnavcompiler/libnavcompiler.iml" filepath="$PROJECT_DIR$/libnavcompiler/libnavcompiler.iml" />
       <module fileurl="file://$PROJECT_DIR$/libnetwork/libnetwork.iml" filepath="$PROJECT_DIR$/libnetwork/libnetwork.iml" />
       <module fileurl="file://$PROJECT_DIR$/pda.iml" filepath="$PROJECT_DIR$/pda.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/libcommon/pda-libcommon.iml" filepath="$PROJECT_DIR$/.idea/modules/libcommon/pda-libcommon.iml" group="pda/libcommon" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/libnavannotation/pda-libnavannotation.iml" filepath="$PROJECT_DIR$/.idea/modules/libnavannotation/pda-libnavannotation.iml" group="pda/libnavannotation" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/libnavcompiler/pda-libnavcompiler.iml" filepath="$PROJECT_DIR$/.idea/modules/libnavcompiler/pda-libnavcompiler.iml" group="pda/libnavcompiler" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/libnetwork/pda-libnetwork.iml" filepath="$PROJECT_DIR$/.idea/modules/libnetwork/pda-libnetwork.iml" group="pda/libnetwork" />
       <module fileurl="file://$PROJECT_DIR$/pda-master/pda-master.iml" filepath="$PROJECT_DIR$/pda-master/pda-master.iml" />
     </modules>
   </component>

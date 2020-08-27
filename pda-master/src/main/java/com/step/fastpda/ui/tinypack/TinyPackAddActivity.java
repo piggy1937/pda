@@ -1,6 +1,5 @@
 package com.step.fastpda.ui.tinypack;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.widget.Toast;
@@ -22,9 +21,6 @@ import com.step.fastpda.databinding.ActivityLayoutTinypackAddBinding;
 import com.step.fastpda.ui.login.UserManager;
 import com.step.fastpda.ui.shipping.ResponseInfo;
 import com.step.fastpda.utils.StatusBar;
-import com.tech.libcommon.global.CallbackManager;
-import com.tech.libcommon.global.CallbackType;
-import com.tech.libcommon.global.IGlobalCallback;
 import com.tech.libnetwork.ApiResponse;
 import com.tech.libnetwork.ApiService;
 import com.tech.libnetwork.JsonCallback;
@@ -32,7 +28,6 @@ import com.tech.libnetwork.JsonCallback;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -192,7 +187,7 @@ public class TinyPackAddActivity extends AppCompatActivity implements  BarcodeRe
         }
         String barcode=mBinding.edPackingSn.getText().toString();
         String txtSL = mBinding.edPackingQuantity.getText().toString();
-        ApiService.post("/tinypack")
+        ApiService.post("/Data/parsebarcode")
                 .addParam("barcode", barcode)
                 .addParam("txtSL",txtSL)
                 .addParam("creator",UserManager.get().getUser().getName())
