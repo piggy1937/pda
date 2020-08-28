@@ -1,11 +1,14 @@
 package com.step.fastpda.ui.tinypack;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.alibaba.fastjson.TypeReference;
 import com.honeywell.aidc.AidcManager;
@@ -16,6 +19,7 @@ import com.honeywell.aidc.ScannerNotClaimedException;
 import com.honeywell.aidc.ScannerUnavailableException;
 import com.honeywell.aidc.TriggerStateChangeEvent;
 import com.honeywell.aidc.UnsupportedPropertyException;
+import com.step.fastpda.R;
 import com.step.fastpda.databinding.ActivityLayoutTinypackAddBinding;
 import com.step.fastpda.ui.login.BaseResponseInfo;
 import com.step.fastpda.ui.login.UserManager;
@@ -43,6 +47,18 @@ public class TinyPackAddActivity extends AppCompatActivity implements  BarcodeRe
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                View decorView = getWindow().getDecorView();
+                int option = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+                decorView.setSystemUiVisibility(option);
+                getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimary));
+            }
+         Toolbar mToolbar = (Toolbar) findViewById(R.id.tb_tinypack);
+
+        setSupportActionBar(mToolbar);
+
+
         StatusBar.lightStatusBar(this, false);
         mBinding= ActivityLayoutTinypackAddBinding.inflate(LayoutInflater.from(this));
         setContentView(mBinding.getRoot());

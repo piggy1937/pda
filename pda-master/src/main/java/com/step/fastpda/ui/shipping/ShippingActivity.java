@@ -1,13 +1,16 @@
 package com.step.fastpda.ui.shipping;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.alibaba.fastjson.TypeReference;
 import com.google.common.base.Splitter;
@@ -19,6 +22,7 @@ import com.honeywell.aidc.ScannerNotClaimedException;
 import com.honeywell.aidc.ScannerUnavailableException;
 import com.honeywell.aidc.TriggerStateChangeEvent;
 import com.honeywell.aidc.UnsupportedPropertyException;
+import com.step.fastpda.R;
 import com.step.fastpda.databinding.ActivityLayoutShippingAddBinding;
 import com.step.fastpda.utils.StatusBar;
 import com.tech.libnetwork.ApiResponse;
@@ -43,6 +47,18 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            View decorView = getWindow().getDecorView();
+            int option = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+            decorView.setSystemUiVisibility(option);
+            getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimary));
+        }
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.tb_shipping);
+
+        setSupportActionBar(mToolbar);
+
+
         StatusBar.lightStatusBar(this, false);
         mBinding = ActivityLayoutShippingAddBinding.inflate(LayoutInflater.from(this));
         setContentView(mBinding.getRoot());

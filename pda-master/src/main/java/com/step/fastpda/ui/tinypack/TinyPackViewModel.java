@@ -50,7 +50,11 @@ public class TinyPackViewModel extends AbsViewModel<TinyPackList> {
         @NonNull
         @Override
         public Long getKey(@NonNull TinyPackList item) {
-            return item.id;
+             if(item!=null){
+                 return item.id;
+            }else{
+                 return 0L;
+             }
         }
     }
 

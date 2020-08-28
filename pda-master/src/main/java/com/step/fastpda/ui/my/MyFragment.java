@@ -14,6 +14,7 @@ import com.step.fastpda.R;
 import com.step.fastpda.databinding.FragmentMyBinding;
 import com.step.fastpda.model.User;
 import com.step.fastpda.ui.login.UserManager;
+import com.step.fastpda.utils.PreferenceUtils;
 import com.step.fastpda.utils.StatusBar;
 import com.tech.libnavannotation.FragmentDestination;
 
@@ -50,7 +51,9 @@ public class MyFragment extends Fragment {
                 .setMessage(getString(R.string.fragment_my_logout))
                 .setPositiveButton(getString(R.string.fragment_my_logout_ok), (dialog, which) -> {
                     dialog.dismiss();
+                    PreferenceUtils.putString(getContext(),"PASSWORD","");
                     UserManager.get().logout();
+
                     getActivity().onBackPressed();
                 }).setNegativeButton(getString(R.string.fragment_my_logout_cancel), null)
                 .create().show());
