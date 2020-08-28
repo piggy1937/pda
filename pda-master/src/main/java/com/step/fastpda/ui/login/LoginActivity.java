@@ -145,6 +145,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                 user.setExpires_time(new Date().getTime()+2*60*60*1000);
                 user.setName(userName);
+                user.setAvatar(R.mipmap.avatar+"");
+                user.setDescription("这家伙很懒,啥也没有写");
                 UserManager.get().save(user);
                 String apiHost=mApiHost.getText().toString();
                 if(apiHost!=null&&!apiHost.isEmpty()){

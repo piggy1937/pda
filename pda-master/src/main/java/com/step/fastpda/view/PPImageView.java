@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -33,6 +34,7 @@ import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
  * description：
  */
 public class PPImageView extends AppCompatImageView {
+    private static  final String TAG="PPImageView";
     public PPImageView(Context context) {
         super(context);
     }
@@ -58,7 +60,16 @@ public class PPImageView extends AppCompatImageView {
 
     @BindingAdapter(value = {"image_url", "isCircle", "radius"}, requireAll = false)
     public static void setImageUrl(PPImageView view, String imageUrl, boolean isCircle, int radius) {
-        RequestBuilder<Drawable> builder = Glide.with(view).load(imageUrl);
+        RequestBuilder<Drawable> builder=null;
+        if(!imageUrl.isEmpty()&&imageUrl.indexOf("http")>0){
+            builder = Glide.with(view).load(imageUrl);
+        }else{
+            try {
+                builder = Glide.with(view).load(Integer.parseInt(imageUrl));
+            } catch (NumberFormatException e) {
+               Log.w(TAG,e.getMessage());
+            }
+        }
         if (isCircle) {
             builder.transform(new CircleCrop());
         } else if (radius > 0) {

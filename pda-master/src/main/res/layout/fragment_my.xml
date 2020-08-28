@@ -8,7 +8,7 @@
         <variable
             name="user"
             type="com.step.fastpda.model.User" />
-
+        <import type="com.step.fastpda.utils.StringConvert"></import>
 
 
     </data>
@@ -27,6 +27,7 @@
             android:scaleType="fitXY"
             android:background="@color/colorPrimary"></com.step.fastpda.view.PPImageView>
 
+
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/action_logout"
             android:layout_width="wrap_content"
@@ -38,15 +39,18 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"></androidx.appcompat.widget.AppCompatImageView>
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <com.step.fastpda.view.PPImageView
             android:id="@+id/avatar"
             android:layout_width="@dimen/dp_45"
             android:layout_height="@dimen/dp_45"
             android:layout_marginLeft="@dimen/dp_16"
             android:layout_marginTop="75dp"
+            app:image_url="@{user.avatar}"
+            app:isCircle="@{true}"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:src="@mipmap/avatar"></androidx.appcompat.widget.AppCompatImageView>
+            app:radius="@{0}"
+            tools:src="@mipmap/avatar"></com.step.fastpda.view.PPImageView>
 
         <TextView
             android:id="@+id/name"
@@ -101,7 +105,39 @@
             app:cardUseCompatPadding="true"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
+                <TextView
+                    android:id="@+id/like_count"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:lineSpacingMultiplier="1.3"
+                    android:text="@{StringConvert.convertSpannable(user.likeCount,@string/current_date_count)}"
+                    android:textColor="@color/color_666"
+                    tools:text="100\n当日记录"></TextView>
+
+                <TextView
+                    android:id="@+id/fans_count"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:lineSpacingMultiplier="1.3"
+                    android:text="@{StringConvert.convertSpannable(user.followerCount,@string/histtory_count)}"
+                    android:textColor="@color/color_666"
+                    tools:text="100\n历史记录"></TextView>
+
+
+
+
+
+            </LinearLayout>
 
         </androidx.cardview.widget.CardView>
 

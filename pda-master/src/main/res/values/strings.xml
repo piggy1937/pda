@@ -44,6 +44,8 @@
     <string name="tag_list_no_follow">还没关注任何数据,去推荐页面看看吧~</string>
     <string name="tag_list_no_follow_button">看看推荐</string>
     <string name="like_count">\n获赞</string>
+    <string name="current_date_count">\n当日记录</string>
+    <string name="histtory_count">\n历史记录</string>
     <string name="fans_count">\n粉丝</string>
     <string name="follow_count">\n关注</string>
     <string name="score_count">\n积分</string>
