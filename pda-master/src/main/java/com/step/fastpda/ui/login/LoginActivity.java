@@ -100,6 +100,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         mPassword.setText(sPassword);
         mApiHost.setText(sApiHost);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(!UserManager.get().isLogin()) {
+            String sPassword = PreferenceUtils.getString(LoginActivity.this, "PASSWORD", "");
+            mPassword.setText(sPassword);
+        }
+    }
+
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.action_login) {
