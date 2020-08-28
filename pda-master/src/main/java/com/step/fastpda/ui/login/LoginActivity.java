@@ -42,7 +42,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private TextInputEditText mApiHost;
     private MaterialButton actionLogin;
     private View actionClose;
-    private boolean isHidden=true;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +53,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 .colorRes(R.color.color_666)
                 .actionBarSize();
         mPassword.setCompoundDrawables(null, null, iconDrawable, null);
+
         mPassword.setOnTouchListener(new View.OnTouchListener() {
 
 
@@ -67,23 +67,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 if (drawable == null) {
                     return false;
                 }
-                //如果不是按下事件，不做处理
-                if(event.getAction()!=MotionEvent.ACTION_UP){
-                    return false;
-                }
-                //drawable.getIntrinsicWidth() 获取drawable资源图片呈现的宽度
-                if(event.getX()>mPassword.getWidth()- mPassword.getPaddingRight()-drawable.getIntrinsicWidth()){
-
-                    if (isHidden) {
-                        //设置EditText文本为可见的
-                        mPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-                    } else {
-                        //设置EditText文本为隐藏的
-                        mPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                    }
-                    isHidden=!isHidden;
+                switch (event.getAction()){
+                    case MotionEvent.ACTION_DOWN:
+                        if(event.getX()>mPassword.getWidth()- mPassword.getPaddingRight()-drawable.getIntrinsicWidth()){
+                            mPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                        }
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        if(event.getX()>mPassword.getWidth()- mPassword.getPaddingRight()-drawable.getIntrinsicWidth()){
+                            mPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                        }
+                        break;
 
                 }
+                mPassword.setSelection(mPassword.getText()!=null?mPassword.getText().length():0);
                 return false;
             }
         });
@@ -123,10 +120,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void login() {
         String userName=mUsername.getText().toString();
         String password=mPassword.getText().toString();
+        String apiHost = mApiHost.getText().toString();
+        if(apiHost!=null&&!apiHost.isEmpty()){
+            ApiService.init(apiHost.toString(),null);
+        }
         new AsyncTask<String, Void, BaseResponseInfo>() {
             //该方法运行在后台线程中，因此不能在该线程中更新UI，UI线程为主线程
             @Override
             protected BaseResponseInfo doInBackground(String... params) {
+
                 ApiResponse apiResponse= ApiService.post("/Data/Login")
                         .cacheStrategy(NET_ONLY)
                         .addParam("username",params[0])
@@ -158,10 +160,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 user.setAvatar(R.mipmap.avatar+"");
                 user.setDescription("这家伙很懒,啥也没有写");
                 UserManager.get().save(user);
-                String apiHost=mApiHost.getText().toString();
-                if(apiHost!=null&&!apiHost.isEmpty()){
-                    ApiService.init(apiHost.toString(),null);
-                }
                 PreferenceUtils.putString(LoginActivity.this,"USER_NAME", userName);
                 PreferenceUtils.putString(LoginActivity.this,"PASSWORD", password);
                 PreferenceUtils.putString(LoginActivity.this,"API_HOST", apiHost);
