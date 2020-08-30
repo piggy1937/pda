@@ -22,6 +22,7 @@ import com.step.fastpda.MainActivity;
 import com.step.fastpda.R;
 import com.step.fastpda.model.User;
 import com.step.fastpda.utils.PreferenceUtils;
+import com.step.fastpda.view.LoadingView;
 import com.tech.libnetwork.ApiResponse;
 import com.tech.libnetwork.ApiService;
 
@@ -43,6 +44,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private MaterialButton actionLogin;
     private View actionClose;
     private boolean isHidden=true;
+    private LoadingView mLoadingView;//加载dailog
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +94,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         mApiHost= findViewById(R.id.edit_sign_in_host);
         actionLogin= findViewById(R.id.action_login);
         actionLogin.setOnClickListener(this);
+        mLoadingView= new LoadingView(this,R.style.CustomDialog);
 
         String sUsername= PreferenceUtils.getString(LoginActivity.this,"USER_NAME","");
         String sPassword= PreferenceUtils.getString(LoginActivity.this,"PASSWORD","");
@@ -123,10 +126,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void login() {
         String userName=mUsername.getText().toString();
         String password=mPassword.getText().toString();
+        mLoadingView.show();
         new AsyncTask<String, Void, BaseResponseInfo>() {
             //该方法运行在后台线程中，因此不能在该线程中更新UI，UI线程为主线程
             @Override
             protected BaseResponseInfo doInBackground(String... params) {
+
                 ApiResponse apiResponse= ApiService.post("/Data/Login")
                         .cacheStrategy(NET_ONLY)
                         .addParam("username",params[0])
@@ -143,12 +148,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             // 后台的计算结果将通过该方法传递到UI线程，并且在界面上展示给用户.
             @Override
             protected void onPostExecute(BaseResponseInfo responseInfo) {
+                mLoadingView.dismiss();
                 if(responseInfo==null){
-                    Toast.makeText(LoginActivity.this,"用户名密码错误",Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivity.this,"用户名密码错误",Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if(responseInfo.getErrCode().equals("0")){
-                    Toast.makeText(LoginActivity.this,"用户名密码错误",Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivity.this,"用户名密码错误",Toast.LENGTH_SHORT).show();
                     return;
                 }
                 User user = new User();
