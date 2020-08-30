@@ -21,6 +21,7 @@ import com.joanzapata.iconify.fonts.FontAwesomeIcons;
 import com.step.fastpda.MainActivity;
 import com.step.fastpda.R;
 import com.step.fastpda.model.User;
+import com.step.fastpda.utils.NetworkDetector;
 import com.step.fastpda.utils.PreferenceUtils;
 import com.step.fastpda.view.LoadingView;
 import com.tech.libnetwork.ApiResponse;
@@ -124,13 +125,21 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
      * 登录系统
      */
     private void login() {
+        if(!NetworkDetector.detect(this)){
+            Toast.makeText(LoginActivity.this,"当期网络不可用，请稍后再试",Toast.LENGTH_SHORT).show();
+            return;
+        }
         String userName=mUsername.getText().toString();
         String password=mPassword.getText().toString();
+        String apiHost=mApiHost.getText().toString();
+        if(apiHost!=null&&!apiHost.isEmpty()){
+            ApiService.init(apiHost,null);
+        }
         mLoadingView.show();
-        new AsyncTask<String, Void, BaseResponseInfo>() {
+        new AsyncTask<String, Void, ApiResponse>() {
             //该方法运行在后台线程中，因此不能在该线程中更新UI，UI线程为主线程
             @Override
-            protected BaseResponseInfo doInBackground(String... params) {
+            protected ApiResponse doInBackground(String... params) {
 
                 ApiResponse apiResponse= ApiService.post("/Data/Login")
                         .cacheStrategy(NET_ONLY)
@@ -138,25 +147,25 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         .addParam("password",params[1])
                         .responseType(new TypeReference<BaseResponseInfo>(){}.getType())
                         .execute();
-                if(apiResponse!=null&&apiResponse.body!=null){
-                    return (BaseResponseInfo) apiResponse.body;
-                }
-                return null;
+
+                return apiResponse;
             }
 
             //在doInBackground 执行完成后，onPostExecute 方法将被UI 线程调用，
             // 后台的计算结果将通过该方法传递到UI线程，并且在界面上展示给用户.
             @Override
-            protected void onPostExecute(BaseResponseInfo responseInfo) {
+            protected void onPostExecute(ApiResponse apiResponse) {
+                BaseResponseInfo responseInfo=null;
+
+                if(apiResponse!=null&&apiResponse.body!=null){
+                    responseInfo= (BaseResponseInfo) apiResponse.body;
+                }
                 mLoadingView.dismiss();
-                if(responseInfo==null){
+                if(responseInfo==null||responseInfo.getErrCode().equals("0")){
                     Toast.makeText(LoginActivity.this,"用户名密码错误",Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if(responseInfo.getErrCode().equals("0")){
-                    Toast.makeText(LoginActivity.this,"用户名密码错误",Toast.LENGTH_SHORT).show();
-                    return;
-                }
+
                 User user = new User();
 
                 user.setExpires_time(new Date().getTime()+2*60*60*1000);
@@ -164,10 +173,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 user.setAvatar(R.mipmap.avatar+"");
                 user.setDescription("这家伙很懒,啥也没有写");
                 UserManager.get().save(user);
-                String apiHost=mApiHost.getText().toString();
-                if(apiHost!=null&&!apiHost.isEmpty()){
-                    ApiService.init(apiHost.toString(),null);
-                }
                 PreferenceUtils.putString(LoginActivity.this,"USER_NAME", userName);
                 PreferenceUtils.putString(LoginActivity.this,"PASSWORD", password);
                 PreferenceUtils.putString(LoginActivity.this,"API_HOST", apiHost);
