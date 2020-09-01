@@ -78,7 +78,11 @@ public class TinyPackViewModel extends AbsViewModel<TinyPackList> {
         if(tinyPackResponseInfos!=null&&tinyPackResponseInfos.getBarcodelist()!=null) {
             for(TinyPackResponseInfo.BarcodelistBean bean:tinyPackResponseInfos.getBarcodelist()){
                 TinyPackList entity = new TinyPackList();
+                if(bean.getId()==null||bean.getId()==0){
+                    continue;
+                }
                 entity.setId(bean.getId());
+
                 entity.setBarcode(bean.getBarcode());
                 entity.setLastModifyTime(bean.getLastModifyTime());
                 entity.setQuantity(bean.getQuantity());

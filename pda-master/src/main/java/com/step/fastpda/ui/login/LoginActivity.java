@@ -42,6 +42,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private TextInputEditText mApiHost;
     private MaterialButton actionLogin;
     private View actionClose;
+    private boolean isHidden=true;
+    private LoadingView mLoadingView;//加载dailog
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +55,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 .colorRes(R.color.color_666)
                 .actionBarSize();
         mPassword.setCompoundDrawables(null, null, iconDrawable, null);
-
         mPassword.setOnTouchListener(new View.OnTouchListener() {
 
 
@@ -67,20 +68,23 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 if (drawable == null) {
                     return false;
                 }
-                switch (event.getAction()){
-                    case MotionEvent.ACTION_DOWN:
-                        if(event.getX()>mPassword.getWidth()- mPassword.getPaddingRight()-drawable.getIntrinsicWidth()){
-                            mPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-                        }
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        if(event.getX()>mPassword.getWidth()- mPassword.getPaddingRight()-drawable.getIntrinsicWidth()){
-                            mPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                        }
-                        break;
+                //如果不是按下事件，不做处理
+                if(event.getAction()!=MotionEvent.ACTION_UP){
+                    return false;
+                }
+                //drawable.getIntrinsicWidth() 获取drawable资源图片呈现的宽度
+                if(event.getX()>mPassword.getWidth()- mPassword.getPaddingRight()-drawable.getIntrinsicWidth()){
+
+                    if (isHidden) {
+                        //设置EditText文本为可见的
+                        mPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                    } else {
+                        //设置EditText文本为隐藏的
+                        mPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                    }
+                    isHidden=!isHidden;
 
                 }
-                mPassword.setSelection(mPassword.getText()!=null?mPassword.getText().length():0);
                 return false;
             }
         });
@@ -89,6 +93,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         mApiHost= findViewById(R.id.edit_sign_in_host);
         actionLogin= findViewById(R.id.action_login);
         actionLogin.setOnClickListener(this);
+        mLoadingView= new LoadingView(this,R.style.CustomDialog);
 
         String sUsername= PreferenceUtils.getString(LoginActivity.this,"USER_NAME","");
         String sPassword= PreferenceUtils.getString(LoginActivity.this,"PASSWORD","");
@@ -118,16 +123,21 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
      * 登录系统
      */
     private void login() {
+        if(!NetworkDetector.detect(this)){
+            Toast.makeText(LoginActivity.this,"当期网络不可用，请稍后再试",Toast.LENGTH_SHORT).show();
+            return;
+        }
         String userName=mUsername.getText().toString();
         String password=mPassword.getText().toString();
-        String apiHost = mApiHost.getText().toString();
+        String apiHost=mApiHost.getText().toString();
         if(apiHost!=null&&!apiHost.isEmpty()){
-            ApiService.init(apiHost.toString(),null);
+            ApiService.init(apiHost,null);
         }
-        new AsyncTask<String, Void, BaseResponseInfo>() {
+        mLoadingView.show();
+        new AsyncTask<String, Void, ApiResponse>() {
             //该方法运行在后台线程中，因此不能在该线程中更新UI，UI线程为主线程
             @Override
-            protected BaseResponseInfo doInBackground(String... params) {
+            protected ApiResponse doInBackground(String... params) {
 
                 ApiResponse apiResponse= ApiService.post("/Data/Login")
                         .cacheStrategy(NET_ONLY)
@@ -135,22 +145,22 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         .addParam("password",params[1])
                         .responseType(new TypeReference<BaseResponseInfo>(){}.getType())
                         .execute();
-                if(apiResponse!=null&&apiResponse.body!=null){
-                    return (BaseResponseInfo) apiResponse.body;
-                }
-                return null;
+
+                return apiResponse;
             }
 
             //在doInBackground 执行完成后，onPostExecute 方法将被UI 线程调用，
             // 后台的计算结果将通过该方法传递到UI线程，并且在界面上展示给用户.
             @Override
-            protected void onPostExecute(BaseResponseInfo responseInfo) {
-                if(responseInfo==null){
-                    Toast.makeText(LoginActivity.this,"用户名密码错误",Toast.LENGTH_LONG).show();
-                    return;
+            protected void onPostExecute(ApiResponse apiResponse) {
+                BaseResponseInfo responseInfo=null;
+
+                if(apiResponse!=null&&apiResponse.body!=null){
+                    responseInfo= (BaseResponseInfo) apiResponse.body;
                 }
-                if(responseInfo.getErrCode().equals("0")){
-                    Toast.makeText(LoginActivity.this,"用户名密码错误",Toast.LENGTH_LONG).show();
+                mLoadingView.dismiss();
+                if(responseInfo==null||responseInfo.getErrCode().equals("0")){
+                    Toast.makeText(LoginActivity.this,"用户名密码错误",Toast.LENGTH_SHORT).show();
                     return;
                 }
                 User user = new User();
