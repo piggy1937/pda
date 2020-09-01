@@ -21,7 +21,9 @@ import com.joanzapata.iconify.fonts.FontAwesomeIcons;
 import com.step.fastpda.MainActivity;
 import com.step.fastpda.R;
 import com.step.fastpda.model.User;
+import com.step.fastpda.utils.NetworkDetector;
 import com.step.fastpda.utils.PreferenceUtils;
+import com.step.fastpda.view.LoadingView;
 import com.tech.libnetwork.ApiResponse;
 import com.tech.libnetwork.ApiService;
 
@@ -68,23 +70,21 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 if (drawable == null) {
                     return false;
                 }
-                //如果不是按下事件，不做处理
-                if(event.getAction()!=MotionEvent.ACTION_UP){
-                    return false;
-                }
-                //drawable.getIntrinsicWidth() 获取drawable资源图片呈现的宽度
-                if(event.getX()>mPassword.getWidth()- mPassword.getPaddingRight()-drawable.getIntrinsicWidth()){
-
-                    if (isHidden) {
-                        //设置EditText文本为可见的
-                        mPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-                    } else {
-                        //设置EditText文本为隐藏的
-                        mPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                    }
-                    isHidden=!isHidden;
+                switch (event.getAction()){
+                    case MotionEvent.ACTION_DOWN:
+                        if(event.getX()>mPassword.getWidth()- mPassword.getPaddingRight()-drawable.getIntrinsicWidth()){
+                            mPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                        }
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        if(event.getX()>mPassword.getWidth()- mPassword.getPaddingRight()-drawable.getIntrinsicWidth()){
+                            mPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                        }
+                        break;
 
                 }
+                mPassword.setSelection(mPassword.getText()!=null?mPassword.getText().length():0);
+
                 return false;
             }
         });
