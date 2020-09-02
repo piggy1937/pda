@@ -4,6 +4,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -24,6 +25,7 @@ import com.step.fastpda.databinding.ActivityLayoutTinypackAddBinding;
 import com.step.fastpda.ui.login.BaseResponseInfo;
 import com.step.fastpda.ui.login.UserManager;
 import com.step.fastpda.utils.StatusBar;
+import com.step.fastpda.view.LoadingView;
 import com.tech.libnetwork.ApiResponse;
 import com.tech.libnetwork.ApiService;
 import com.tech.libnetwork.JsonCallback;
@@ -44,6 +46,9 @@ public class TinyPackAddActivity extends AppCompatActivity implements  BarcodeRe
     private ActivityLayoutTinypackAddBinding mBinding;
     private BarcodeReader mBarcodeReader;
     private String mLastModifyTime;
+    private LoadingView mLoadingView;//加载dailog
+    private EditText mEdPackingSn;
+    private EditText mEdPackingQuantity;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,8 +85,9 @@ public class TinyPackAddActivity extends AppCompatActivity implements  BarcodeRe
                 initBarcodeReader(mBarcodeReader);
             }
         });
-
-
+        mLoadingView= new LoadingView(this,R.style.CustomDialog);
+        mEdPackingSn=findViewById(R.id.ed_packing_sn);
+        mEdPackingQuantity=findViewById(R.id.ed_packing_quantity);
 
     }
     @Override
@@ -124,7 +130,8 @@ public class TinyPackAddActivity extends AppCompatActivity implements  BarcodeRe
     public void onBarcodeEvent(BarcodeReadEvent event) {
         final String barcodeData = event.getBarcodeData();
         mLastModifyTime= event.getTimestamp();
-        mBinding.edPackingSn.setText(barcodeData);
+        mEdPackingSn.setText(barcodeData);
+        insertTinyPack();
     }
 
     @Override
@@ -199,8 +206,9 @@ public class TinyPackAddActivity extends AppCompatActivity implements  BarcodeRe
         if(mBinding.cbTinyPackAttach.isChecked()){
             type ="attach";
         }
-        String barcode=mBinding.edPackingSn.getText().toString();
-        String txtSL = mBinding.edPackingQuantity.getText().toString();
+        String barcode=mEdPackingSn.getText().toString();
+        String txtSL = mEdPackingQuantity.getText().toString();
+        mLoadingView.show();
         ApiService.post("/Data/parsebarcode")
                 .addParam("barcode", barcode)
                 .addParam("txtSL",txtSL)
@@ -220,6 +228,7 @@ public class TinyPackAddActivity extends AppCompatActivity implements  BarcodeRe
                                     mBinding.edPackingQuantity.setText("0");
                                     mBinding.edPackingSn.setText("");
                                     mBinding.edPackingSn.requestFocus();
+                                    mLoadingView.dismiss();
                                 }
                             });
                         }else{
@@ -228,11 +237,13 @@ public class TinyPackAddActivity extends AppCompatActivity implements  BarcodeRe
                                     @Override
                                     public void run() {
                                          Toast.makeText(TinyPackAddActivity.this, baseResponseInfo.getErrMsg(), Toast.LENGTH_SHORT).show();
+                                        mLoadingView.dismiss();
                                     }
                                 });
                             }
                         }
-                    }
+
+                }
 
                     @Override
                     public void onError(ApiResponse<BaseResponseInfo> response) {
@@ -246,6 +257,7 @@ public class TinyPackAddActivity extends AppCompatActivity implements  BarcodeRe
                                     mBinding.edPackingSn.setText("");
                                     mBinding.edPackingSn.requestFocus();
                                     Toast.makeText(TinyPackAddActivity.this, baseResponseInfo.getErrMsg(), Toast.LENGTH_SHORT).show();
+                                    mLoadingView.dismiss();
                                 }
                             });
                         }

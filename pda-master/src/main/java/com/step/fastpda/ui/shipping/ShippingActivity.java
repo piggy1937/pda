@@ -24,6 +24,7 @@ import com.step.fastpda.R;
 import com.step.fastpda.databinding.ActivityLayoutShippingAddBinding;
 import com.step.fastpda.ui.login.BaseResponseInfo;
 import com.step.fastpda.utils.StatusBar;
+import com.step.fastpda.view.LoadingView;
 import com.tech.libnetwork.ApiResponse;
 import com.tech.libnetwork.ApiService;
 import com.tech.libnetwork.JsonCallback;
@@ -44,6 +45,7 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
     private ActivityLayoutShippingAddBinding mBinding;
     private BarcodeReader mBarcodeReader;
     private String mLastModifyTime;
+    private LoadingView mLoadingView;//加载dailog
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,8 +71,8 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
         });
         mBinding.btnTinyShippingSubmit.setOnClickListener(e->{
             String param = mBinding.edShippingOrderSn.getText().toString();
-            List<String> stringList=Splitter.on("%").splitToList(param);
-            insertShipping(stringList);
+
+            insertShipping(param);
 
         });
         AidcManager.create(this, new AidcManager.CreatedCallback() {
@@ -81,12 +83,18 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
                 initBarcodeReader(mBarcodeReader);
             }
         });
+        mLoadingView= new LoadingView(this,R.style.CustomDialog);
     }
 
     /***
      * 新增小包标签
      */
-    private void insertShipping(List<String> params) {
+    private void insertShipping(String mParam) {
+        if(mParam.isEmpty()){
+            return;
+        }
+        List<String> params=Splitter.on("%").splitToList(mParam);
+        mLoadingView.show();
         ApiService.post("/Data/ParsebarcodeMT")
                 .addParam("instockNo",params.get(0))
                 .addParam("inStockNumber",params.get(1))
@@ -105,6 +113,7 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
                                 @Override
                                 public void run() {
                                     mBinding.edShippingOrderSn.setText("");
+                                    mLoadingView.dismiss();
                                 }
                             });
                         }else{
@@ -113,6 +122,7 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
                                     @Override
                                     public void run() {
                                         Toast.makeText(ShippingActivity.this, baseResponseInfo.getErrMsg(), Toast.LENGTH_SHORT).show();
+                                        mLoadingView.dismiss();
                                     }
                                 });
                             }
@@ -127,7 +137,7 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-
+                                    mLoadingView.dismiss();
                                     Toast.makeText(ShippingActivity.this, baseResponseInfo.getErrMsg(), Toast.LENGTH_SHORT).show();
                                 }
                             });
@@ -185,6 +195,9 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
         final String barcodeData = event.getBarcodeData();
         mLastModifyTime= event.getTimestamp();
         mBinding.edShippingOrderSn.setText(barcodeData);
+        if(!barcodeData.isEmpty()) {
+            insertShipping(barcodeData);
+        }
     }
 
     @Override
