@@ -15,7 +15,7 @@ public class PdaApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        ApiService.init("http://114.88.75.45:1234", null);
+        ApiService.init("http://192.168.20.44:5000", null);
         Iconify.with(new FontAwesomeModule());
         CrashReport.initCrashReport(getApplicationContext(), "8af2af4e98", true);
     }

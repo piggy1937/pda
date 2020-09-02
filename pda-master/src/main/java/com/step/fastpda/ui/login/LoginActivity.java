@@ -97,7 +97,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         String sUsername= PreferenceUtils.getString(LoginActivity.this,"USER_NAME","");
         String sPassword= PreferenceUtils.getString(LoginActivity.this,"PASSWORD","");
-        String sApiHost= PreferenceUtils.getString(LoginActivity.this,"API_HOST","http://114.88.75.45:1234");
+        String sApiHost= PreferenceUtils.getString(LoginActivity.this,"API_HOST","http://192.168.20.44:5000");
         mUsername.setText(sUsername);
         mPassword.setText(sPassword);
         mApiHost.setText(sApiHost);

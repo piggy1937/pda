@@ -2,8 +2,6 @@ package com.step.fastpda.ui.shipping;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
@@ -24,9 +22,11 @@ import com.honeywell.aidc.TriggerStateChangeEvent;
 import com.honeywell.aidc.UnsupportedPropertyException;
 import com.step.fastpda.R;
 import com.step.fastpda.databinding.ActivityLayoutShippingAddBinding;
+import com.step.fastpda.ui.login.BaseResponseInfo;
 import com.step.fastpda.utils.StatusBar;
 import com.tech.libnetwork.ApiResponse;
 import com.tech.libnetwork.ApiService;
+import com.tech.libnetwork.JsonCallback;
 
 import java.util.HashMap;
 import java.util.List;
@@ -70,8 +70,8 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
         mBinding.btnTinyShippingSubmit.setOnClickListener(e->{
             String param = mBinding.edShippingOrderSn.getText().toString();
             List<String> stringList=Splitter.on("%").splitToList(param);
-            Thread handler = new Thread(new NetPostHandler(stringList));
-            handler.start();
+            insertShipping(stringList);
+
         });
         AidcManager.create(this, new AidcManager.CreatedCallback() {
 
@@ -81,6 +81,62 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
                 initBarcodeReader(mBarcodeReader);
             }
         });
+    }
+
+    /***
+     * 新增小包标签
+     */
+    private void insertShipping(List<String> params) {
+        ApiService.post("/Data/ParsebarcodeMT")
+                .addParam("instockNo",params.get(0))
+                .addParam("inStockNumber",params.get(1))
+                .addParam("sumQty",params.get(2))
+                .addParam("stockNo",params.get(3))
+                .addParam("position",params.get(4))
+                .responseType(new TypeReference<BaseResponseInfo>() {
+                }.getType())
+                .execute(new JsonCallback<BaseResponseInfo>() {
+                    @Override
+                    public void onSuccess(ApiResponse<BaseResponseInfo> response) {
+                        super.onSuccess(response);
+                        BaseResponseInfo baseResponseInfo = response.body!=null?response.body:null;
+                        if(baseResponseInfo!=null&&baseResponseInfo.getErrCode().equals("1")) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mBinding.edShippingOrderSn.setText("");
+                                }
+                            });
+                        }else{
+                            if(baseResponseInfo!=null) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(ShippingActivity.this, baseResponseInfo.getErrMsg(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onError(ApiResponse<BaseResponseInfo> response) {
+                        super.onError(response);
+                        BaseResponseInfo baseResponseInfo = response.body!=null?response.body:null;
+                        if(baseResponseInfo!=null&&!baseResponseInfo.getErrCode().equals("1")) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    Toast.makeText(ShippingActivity.this, baseResponseInfo.getErrMsg(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+                });
+
+
+
     }
 
     /***
@@ -189,44 +245,6 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
 
     }
 
-    class NetPostHandler implements Runnable {
-        private List<String> mParams;
-        public NetPostHandler(List<String> params) {
-            this.mParams=params;
-        }
 
-        @Override
-        public void run() {
-            ApiResponse apiResponse= ApiService.post("/Data/ParsebarcodeMT")
-                    .addParam("inStockNo",mParams.get(0))
-                    .addParam("inStockNumber",mParams.get(1))
-                    .addParam("sumQty",mParams.get(2))
-                    .addParam("stockNo",mParams.get(3))
-                    .addParam("position",mParams.get(4))
-                    .responseType(new TypeReference<ResponseInfo>(){}.getType())
-                    .execute();
-            if(apiResponse!=null&&apiResponse.body!=null){
-                ResponseInfo responseInfo= (ResponseInfo)apiResponse.body;
-                if(responseInfo!=null&&responseInfo.getCode()!=null&&responseInfo.getCode().endsWith("200")){
-                    handler.sendEmptyMessage(0);
-                }else{
-                    handler.sendEmptyMessage(1);
-                }
-            }else{
-                handler.sendEmptyMessage(1);
-            }
-
-        }
-    }
-    Handler handler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            if(msg.what == 0){
-                Toast.makeText(ShippingActivity.this,"success",Toast.LENGTH_LONG).show();
-            }else{
-                Toast.makeText(ShippingActivity.this,"error",Toast.LENGTH_LONG).show();
-            }
-        }
-    };
 
 }
