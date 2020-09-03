@@ -1,5 +1,6 @@
 package com.step.fastpda.ui.shipping;
 
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -27,7 +28,6 @@ import com.step.fastpda.utils.StatusBar;
 import com.step.fastpda.view.LoadingView;
 import com.tech.libnetwork.ApiResponse;
 import com.tech.libnetwork.ApiService;
-import com.tech.libnetwork.JsonCallback;
 
 import java.util.HashMap;
 import java.util.List;
@@ -95,57 +95,41 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
         }
         List<String> params=Splitter.on("%").splitToList(mParam);
         mLoadingView.show();
-        ApiService.post("/Data/ParsebarcodeMT")
-                .addParam("instockNo",params.get(0))
-                .addParam("inStockNumber",params.get(1))
-                .addParam("sumQty",params.get(2))
-                .addParam("stockNo",params.get(3))
-                .addParam("position",params.get(4))
-                .responseType(new TypeReference<BaseResponseInfo>() {
-                }.getType())
-                .execute(new JsonCallback<BaseResponseInfo>() {
-                    @Override
-                    public void onSuccess(ApiResponse<BaseResponseInfo> response) {
-                        super.onSuccess(response);
-                        BaseResponseInfo baseResponseInfo = response.body!=null?response.body:null;
-                        if(baseResponseInfo!=null&&baseResponseInfo.getErrCode().equals("1")) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mBinding.edShippingOrderSn.setText("");
-                                    mLoadingView.dismiss();
-                                }
-                            });
-                        }else{
-                            if(baseResponseInfo!=null) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(ShippingActivity.this, baseResponseInfo.getErrMsg(), Toast.LENGTH_SHORT).show();
-                                        mLoadingView.dismiss();
-                                    }
-                                });
-                            }
-                        }
-                    }
 
-                    @Override
-                    public void onError(ApiResponse<BaseResponseInfo> response) {
-                        super.onError(response);
-                        BaseResponseInfo baseResponseInfo = response.body!=null?response.body:null;
-                        if(baseResponseInfo!=null&&!baseResponseInfo.getErrCode().equals("1")) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mLoadingView.dismiss();
-                                    Toast.makeText(ShippingActivity.this, baseResponseInfo.getErrMsg(), Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
-                    }
-                });
+        new AsyncTask<String, Void, ApiResponse>() {
+            //该方法运行在后台线程中，因此不能在该线程中更新UI，UI线程为主线程
+            @Override
+            protected ApiResponse doInBackground(String... params) {
+                ApiResponse apiResponse=  ApiService.post("/Data/ParsebarcodeMT")
+                        .addParam("instockNo",params[0])
+                        .addParam("inStockNumber",params[1])
+                        .addParam("sumQty",params[2])
+                        .addParam("stockNo",params[3])
+                        .addParam("position",params[4])
+                        .responseType(new TypeReference<BaseResponseInfo>() {
+                        }.getType()).execute();
 
+                return apiResponse;
+            }
 
+            //在doInBackground 执行完成后，onPostExecute 方法将被UI 线程调用，
+            // 后台的计算结果将通过该方法传递到UI线程，并且在界面上展示给用户.
+            @Override
+            protected void onPostExecute(ApiResponse apiResponse) {
+                BaseResponseInfo responseInfo=null;
+
+                if(apiResponse!=null&&apiResponse.body!=null){
+                    responseInfo= (BaseResponseInfo) apiResponse.body;
+                }
+                mLoadingView.dismiss();
+                mBinding.edShippingOrderSn.setText("");
+                if(responseInfo==null||responseInfo.getErrCode().equals("0")){
+                    Toast.makeText(ShippingActivity.this, responseInfo.getErrMsg(), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Toast.makeText(ShippingActivity.this,"操作成功", Toast.LENGTH_SHORT).show();
+            }
+        }.execute(params.get(0),params.get(1),params.get(2),params.get(3),params.get(4));
 
     }
 
