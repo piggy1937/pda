@@ -5,12 +5,12 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.paging.ItemKeyedDataSource;
 
 import com.alibaba.fastjson.TypeReference;
+import com.google.common.collect.Lists;
 import com.step.fastpda.ui.AbsViewModel;
 import com.tech.libnetwork.ApiResponse;
 import com.tech.libnetwork.ApiService;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -61,17 +61,35 @@ public class ShippingListViewModel extends AbsViewModel<ShippingList> {
         SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
         Integer pageSize = 10;
         Integer pageIndex=(offset+pageSize)/pageSize;
-        ApiResponse<List<ShippingList>> response = ApiService.get("/Data/GetBarcodemt")
+        ApiResponse<ShippingResponseInfo> response = ApiService.get("/Data/GetBarcodemt")
 //                .addParam("creater", UserManager.get().getUserId())
 //                .addParam("RwDate",sdf.format(new Date()))
                 .addParam("pageSize", pageSize)
                 .addParam("pageIndex", pageIndex)
-                .responseType(new TypeReference<ArrayList<ShippingList>>() {
+                .responseType(new TypeReference<ShippingResponseInfo>() {
                 }.getType())
                 .execute();
 
-        List<ShippingList> result = response.body == null ? Collections.emptyList() : response.body;
-        callback.onResult(result);
+        List<ShippingList> result= Lists.newArrayList();
+        ShippingResponseInfo shippingResponseInfo = response.body == null ?null: response.body;
+
+        if(shippingResponseInfo!=null&&shippingResponseInfo.getBarcodelist()!=null) {
+            for(ShippingResponseInfo.BarcodelistBean bean:shippingResponseInfo.getBarcodelist()){
+                ShippingList entity = new ShippingList();
+                if(bean.getId()==null||bean.getId()==0){
+                    continue;
+                }
+                entity.setId(bean.getId());
+
+                entity.setInStockNo(bean.getBarcode());
+                entity.setLastModifyTime(bean.getLastModifyTime());
+                entity.setSumQty(bean.getQuantity());
+                result.add(entity);
+            }
+            callback.onResult(result);
+        }
+
+
         if (requestKey > 0) {
             loadAfter.set(false);
             offset += result.size();

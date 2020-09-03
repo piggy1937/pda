@@ -30,7 +30,7 @@
                 android:layout_marginStart="2dp"
                 android:layout_marginLeft="2dp"
                 android:text="@{tinyPackList.quantity>0?String.valueOf(tinyPackList.quantity):String.valueOf(0)}"
-                android:textColor="#FF34393F"
+                android:textColor="@color/color_000"
                 android:textSize="14sp" />
 
             <TextView
@@ -40,7 +40,7 @@
                 android:layout_toStartOf="@id/tv_tinypack_quantity"
                 android:layout_toLeftOf="@id/tv_tinypack_quantity"
                 android:text="@{tinyPackList.barcode}"
-                android:textColor="#FF34393F"
+                android:textColor="@color/color_000"
                 android:textSize="14sp" />
 
             <TextView
@@ -52,7 +52,7 @@
                 android:layout_toStartOf="@+id/tv_volume"
                 android:layout_toLeftOf="@+id/tv_volume"
                 android:text="@{TimeUtils.calculate(tinyPackList.lastModifyTime)}"
-                android:textColor="#FFA3A5A8"
+                android:textColor="@color/color_999"
                 android:textSize="12sp" />
 
             <TextView
@@ -64,7 +64,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_marginStart="2dp"
                 android:layout_marginLeft="2dp"
-                android:textColor="#FFA3A5A8"
+                android:textColor="@color/color_999"
                 android:textSize="12sp" />
         </RelativeLayout>
                 <LinearLayout
