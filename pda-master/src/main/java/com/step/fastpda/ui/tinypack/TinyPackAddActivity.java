@@ -253,6 +253,7 @@ public class TinyPackAddActivity extends AppCompatActivity implements  BarcodeRe
                 mEdPackingQuantity.setText("0");
                 mEdPackingSn.setText("");
                 mEdPackingSn.requestFocus();
+                Toast.makeText(TinyPackAddActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
             }
         }.execute(barcode,txtSL,creator,type);
 
