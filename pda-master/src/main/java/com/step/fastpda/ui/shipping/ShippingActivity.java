@@ -77,11 +77,11 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
             setResult(RESULT_CODE);
             finish();
         });
-        mBinding.btnTinyShippingSubmit.setOnClickListener(e->{
-            String mparam = mEdShippingOrderSn.getText().toString();
-            insertShipping(mparam);
-
-        });
+//        mBinding.btnTinyShippingSubmit.setOnClickListener(e->{
+//            String mparam = mEdShippingOrderSn.getText().toString();
+//            insertShipping(mparam);
+//
+//        });
         AidcManager.create(this, new AidcManager.CreatedCallback() {
 
             @Override

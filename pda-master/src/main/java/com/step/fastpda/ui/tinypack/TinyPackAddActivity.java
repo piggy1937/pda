@@ -80,9 +80,9 @@ public class TinyPackAddActivity extends AppCompatActivity implements BarcodeRea
         });
 
 
-        mBinding.btnTinyPackSubmit.setOnClickListener(e -> {
-            //insertTinyPack();
-        });
+//        mBinding.btnTinyPackSubmit.setOnClickListener(e -> {
+//            //insertTinyPack();
+//        });
 
         AidcManager.create(this, new AidcManager.CreatedCallback() {
 
