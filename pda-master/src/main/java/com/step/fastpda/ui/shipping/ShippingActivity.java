@@ -236,7 +236,7 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
                 }
             });
         }else{
-            runOnUiThread(new Runnable() {
+            ShippingActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     mEdShippingOrderSn.setText(barcodeData);

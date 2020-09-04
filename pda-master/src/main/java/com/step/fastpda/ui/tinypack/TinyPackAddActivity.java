@@ -161,7 +161,7 @@ public class TinyPackAddActivity extends AppCompatActivity implements BarcodeRea
             });
 
         }else{
-            runOnUiThread(new Runnable() {
+            TinyPackAddActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     mEdPackingSn.setText(barcodeData);
