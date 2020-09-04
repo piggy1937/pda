@@ -10,5 +10,6 @@ public enum CallbackType {
     TAG_OPEN_PUSH,
     TAG_STOP_PUSH,
     ON_SCAN,
-    ON_SCAN_TIMY_PACK, //扫码小码标签
+    ON_SCAN_TINY_PACK, //扫码小码标签
+    ON_SCAN_SHIPPING_PACK, //扫码小码标签
 }
