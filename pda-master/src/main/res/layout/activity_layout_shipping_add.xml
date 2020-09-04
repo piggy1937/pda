@@ -95,7 +95,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginLeft="@dimen/dp_30"
                     android:layout_marginRight="@dimen/dp_30"
-                    android:visibility="gone"
+                    android:visibility="invisible"
                     app:backgroundTint="@color/color_theme"
                     app:cornerRadius="25dp"
                     android:textColor="@android:color/white"

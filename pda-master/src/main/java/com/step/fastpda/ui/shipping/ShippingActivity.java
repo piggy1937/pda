@@ -13,7 +13,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.alibaba.fastjson.TypeReference;
 import com.google.common.base.Splitter;
 import com.honeywell.aidc.AidcManager;
 import com.honeywell.aidc.BarcodeFailureEvent;
@@ -26,6 +25,7 @@ import com.honeywell.aidc.UnsupportedPropertyException;
 import com.step.fastpda.R;
 import com.step.fastpda.databinding.ActivityLayoutShippingAddBinding;
 import com.step.fastpda.ui.login.BaseResponseInfo;
+import com.step.fastpda.utils.NetworkDetector;
 import com.step.fastpda.utils.StatusBar;
 import com.step.fastpda.view.LoadingView;
 import com.tech.libcommon.global.CallbackManager;
@@ -53,7 +53,6 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
     private String mLastModifyTime;
     private LoadingView mLoadingView;//加载dailog
     private EditText mEdShippingOrderSn;
-    Handler mainHandler = new Handler();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,7 +107,10 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
      * 新增小包标签
      */
     private void insertShipping(String mParam) {
-
+        if(!NetworkDetector.detect(this)){
+            Toast.makeText(ShippingActivity.this,"当期网络不可用，请稍后再试",Toast.LENGTH_SHORT).show();
+            return;
+        }
         if(mParam.isEmpty()){
             Toast.makeText(ShippingActivity.this,"参数错误", Toast.LENGTH_SHORT).show();
             return;
@@ -121,8 +123,6 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
                 .addParam("sumQty",params.get(2))
                 .addParam("stockNo",params.get(3))
                 .addParam("position",params.get(4))
-                .responseType(new TypeReference<BaseResponseInfo>() {
-                }.getType())
                 .execute(new JsonCallback<BaseResponseInfo>() {
                     @Override
                     public void onSuccess(ApiResponse<BaseResponseInfo> response) {
@@ -225,23 +225,32 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
     public void onBarcodeEvent(BarcodeReadEvent event) {
         final String barcodeData = event.getBarcodeData();
         mLastModifyTime= event.getTimestamp();
-//        if (Looper.myLooper() != Looper.getMainLooper()) {
-//            //切换到主进程
-//            Handler mainThread = new Handler(Looper.getMainLooper());
-//        }
-        mainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mEdShippingOrderSn.setText(barcodeData);
-                final IGlobalCallback<String> callback = CallbackManager
-                        .getInstance()
-                        .getCallback(CallbackType.ON_SCAN_SHIPPING_PACK);
-                if (callback != null) {
-                    callback.executeCallback(barcodeData);
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            //切换到主进程
+            Handler mainHandler = new Handler(Looper.getMainLooper());
+            mainHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mEdShippingOrderSn.setText(barcodeData);
+                    insertShipping(barcodeData);
                 }
+            });
+        }else{
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mEdShippingOrderSn.setText(barcodeData);
+                    final IGlobalCallback<String> callback = CallbackManager
+                            .getInstance()
+                            .getCallback(CallbackType.ON_SCAN_SHIPPING_PACK);
+                    if (callback != null) {
+                        callback.executeCallback(barcodeData);
+                    }
 
-            }
-        });
+                }
+            });
+        }
+
 
     }
 

@@ -26,6 +26,7 @@ import com.step.fastpda.R;
 import com.step.fastpda.databinding.ActivityLayoutTinypackAddBinding;
 import com.step.fastpda.ui.login.BaseResponseInfo;
 import com.step.fastpda.ui.login.UserManager;
+import com.step.fastpda.utils.NetworkDetector;
 import com.step.fastpda.utils.StatusBar;
 import com.step.fastpda.view.LoadingView;
 import com.tech.libcommon.global.CallbackManager;
@@ -146,20 +147,36 @@ public class TinyPackAddActivity extends AppCompatActivity implements BarcodeRea
     public void onBarcodeEvent(BarcodeReadEvent event) {
         final String barcodeData = event.getBarcodeData();
         mLastModifyTime = event.getTimestamp();
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            //切换到主进程
+            Handler mainHandler = new Handler(Looper.getMainLooper());
 
-        mainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mEdPackingSn.setText(barcodeData);
-                final IGlobalCallback<String> callback = CallbackManager
-                        .getInstance()
-                        .getCallback(CallbackType.ON_SCAN_TINY_PACK);
-                if (callback != null) {
-                    callback.executeCallback(barcodeData);
+            mainHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mEdPackingSn.setText(barcodeData);
+                    insertTinyPack(barcodeData);
+
                 }
+            });
 
-            }
-        });
+        }else{
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mEdPackingSn.setText(barcodeData);
+                    final IGlobalCallback<String> callback = CallbackManager
+                            .getInstance()
+                            .getCallback(CallbackType.ON_SCAN_TINY_PACK);
+                    if (callback != null) {
+                        callback.executeCallback(barcodeData);
+                    }
+
+                }
+            });
+
+        }
+
 
 
     }
@@ -232,6 +249,10 @@ public class TinyPackAddActivity extends AppCompatActivity implements BarcodeRea
      * 新增小包标签
      */
     private void insertTinyPack(String barcode) {
+        if(!NetworkDetector.detect(this)){
+            Toast.makeText(TinyPackAddActivity.this,"当期网络不可用，请稍后再试",Toast.LENGTH_SHORT).show();
+            return;
+        }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         String type = "normal";
         if (mBinding.cbTinyPackAttach.isChecked()) {
