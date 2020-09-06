@@ -4,6 +4,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -53,6 +54,20 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
     private String mLastModifyTime;
     private LoadingView mLoadingView;//加载dailog
     private EditText mEdShippingOrderSn;
+    private final static int SCAN_OK=0;
+    Handler mHandler = new Handler() {
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case SCAN_OK:
+                    Bundle bundle = msg.getData();
+                    String barcode = bundle.getString("barcode");
+                    mEdShippingOrderSn.setText(barcode);
+                    insertShipping(barcode);
+                    break;
+            }
+            super.handleMessage(msg);
+        }
+    };
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -225,31 +240,38 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
     public void onBarcodeEvent(BarcodeReadEvent event) {
         final String barcodeData = event.getBarcodeData();
         mLastModifyTime= event.getTimestamp();
-        if (Looper.myLooper() != Looper.getMainLooper()) {
-            //切换到主进程
-            Handler mainHandler = new Handler(Looper.getMainLooper());
-            mainHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mEdShippingOrderSn.setText(barcodeData);
-                    insertShipping(barcodeData);
-                }
-            });
-        }else{
-            ShippingActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mEdShippingOrderSn.setText(barcodeData);
-                    final IGlobalCallback<String> callback = CallbackManager
-                            .getInstance()
-                            .getCallback(CallbackType.ON_SCAN_SHIPPING_PACK);
-                    if (callback != null) {
-                        callback.executeCallback(barcodeData);
-                    }
+        Message message = new Message();
+        message.what = SCAN_OK;
+        Bundle bundle = new Bundle();
+        bundle.putString("barcode", barcodeData);
+        message.setData(bundle);
+        mHandler.sendMessage(message);
 
-                }
-            });
-        }
+//        if (Looper.myLooper() != Looper.getMainLooper()) {
+//            //切换到主进程
+//            Handler mainHandler = new Handler(Looper.getMainLooper());
+//            mainHandler.post(new Runnable() {
+//                @Override
+//                public void run() {
+//                    mEdShippingOrderSn.setText(barcodeData);
+//                    insertShipping(barcodeData);
+//                }
+//            });
+//        }else{
+//            ShippingActivity.this.runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    mEdShippingOrderSn.setText(barcodeData);
+//                    final IGlobalCallback<String> callback = CallbackManager
+//                            .getInstance()
+//                            .getCallback(CallbackType.ON_SCAN_SHIPPING_PACK);
+//                    if (callback != null) {
+//                        callback.executeCallback(barcodeData);
+//                    }
+//
+//                }
+//            });
+//        }
 
 
     }
