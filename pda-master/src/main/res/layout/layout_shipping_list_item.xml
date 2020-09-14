@@ -21,7 +21,7 @@
             android:id="@+id/tv_shipping_tag_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
+            android:layout_marginLeft="10dp"
             android:layout_marginTop="@dimen/dimen_20"
             android:text="@{shippingList.inStockNo}"
             android:textColor="@color/color_000"
@@ -37,8 +37,9 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_shipping_tag_title"
             android:layout_marginTop="8dp"
-            tools:text="@{TimeUtils.calculate(shippingList.lastModifyTime)}"
-
+            android:text="@{TimeUtils.calculate(shippingList.lastModifyTime)}"
+            tools:text="2020-09-14"
+            android:layout_marginLeft="10dp"
             android:textColor="@color/color_999"
             android:textSize="12sp" />
 
