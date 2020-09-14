@@ -1,10 +1,13 @@
 package com.step.fastpda.ui.shipping;
 
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -14,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.alibaba.fastjson.TypeReference;
 import com.google.common.base.Splitter;
 import com.honeywell.aidc.AidcManager;
 import com.honeywell.aidc.BarcodeFailureEvent;
@@ -29,12 +33,8 @@ import com.step.fastpda.ui.login.BaseResponseInfo;
 import com.step.fastpda.utils.NetworkDetector;
 import com.step.fastpda.utils.StatusBar;
 import com.step.fastpda.view.LoadingView;
-import com.tech.libcommon.global.CallbackManager;
-import com.tech.libcommon.global.CallbackType;
-import com.tech.libcommon.global.IGlobalCallback;
 import com.tech.libnetwork.ApiResponse;
 import com.tech.libnetwork.ApiService;
-import com.tech.libnetwork.JsonCallback;
 
 import java.util.HashMap;
 import java.util.List;
@@ -55,7 +55,7 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
     private LoadingView mLoadingView;//加载dailog
     private EditText mEdShippingOrderSn;
     private final static int SCAN_OK=0;
-    Handler mHandler = new Handler() {
+    private Handler mHandler = new Handler() {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case SCAN_OK:
@@ -92,11 +92,30 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
             setResult(RESULT_CODE);
             finish();
         });
-//        mBinding.btnTinyShippingSubmit.setOnClickListener(e->{
-//            String mparam = mEdShippingOrderSn.getText().toString();
-//            insertShipping(mparam);
-//
-//        });
+        mEdShippingOrderSn.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+               String param= editable.toString();
+               if(!param.isEmpty()&&param.length()>0) {
+                   mEdShippingOrderSn.removeTextChangedListener(this);
+                   insertShipping(param);
+                   mEdShippingOrderSn.addTextChangedListener(this);
+
+               }
+            }
+        });
+
+        mLoadingView= new LoadingView(ShippingActivity.this,R.style.CustomDialog);
         AidcManager.create(this, new AidcManager.CreatedCallback() {
 
             @Override
@@ -105,16 +124,7 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
                 initBarcodeReader(mBarcodeReader);
             }
         });
-        mLoadingView= new LoadingView(ShippingActivity.this,R.style.CustomDialog);
 
-        CallbackManager.getInstance()
-                .addCallback(CallbackType.ON_SCAN_SHIPPING_PACK, new IGlobalCallback<String>() {
-                    @Override
-                    public void executeCallback(@Nullable String barcode) {
-
-                        insertShipping(barcode);
-                    }
-                });
 
     }
 
@@ -122,6 +132,7 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
      * 新增小包标签
      */
     private void insertShipping(String mParam) {
+
         if(!NetworkDetector.detect(this)){
             Toast.makeText(ShippingActivity.this,"当期网络不可用，请稍后再试",Toast.LENGTH_SHORT).show();
             return;
@@ -132,67 +143,43 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
         }
         List<String> params=Splitter.on("%").splitToList(mParam);
         mLoadingView.show();
-        ApiService.post("/Data/ParsebarcodeMT")
-                .addParam("instockNo",params.get(0))
-                .addParam("inStockNumber",params.get(1))
-                .addParam("sumQty",params.get(2))
-                .addParam("stockNo",params.get(3))
-                .addParam("position",params.get(4))
-                .execute(new JsonCallback<BaseResponseInfo>() {
-                    @Override
-                    public void onSuccess(ApiResponse<BaseResponseInfo> response) {
-                        super.onSuccess(response);
-                        BaseResponseInfo baseResponseInfo = response.body!=null?response.body:null;
-                        if(baseResponseInfo!=null&&baseResponseInfo.getErrCode().equals("1")) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(ShippingActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
-                                    mBinding.edShippingOrderSn.setText("");
-                                    mLoadingView.dismiss();
-                                }
-                            });
-                        }else{
-                            if(baseResponseInfo!=null) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(ShippingActivity.this, baseResponseInfo.getErrMsg(), Toast.LENGTH_SHORT).show();
-                                        mBinding.edShippingOrderSn.setText("");
-                                        mLoadingView.dismiss();
-                                    }
-                                });
-                            }
-                        }
-                    }
+        new AsyncTask<String, Void, ApiResponse>() {
+            //该方法运行在后台线程中，因此不能在该线程中更新UI，UI线程为主线程
+            @Override
+            protected ApiResponse doInBackground(String... params) {
 
-                    @Override
-                    public void onError(ApiResponse<BaseResponseInfo> response) {
-                        super.onError(response);
-                        BaseResponseInfo baseResponseInfo = response.body!=null?response.body:null;
-                        if(baseResponseInfo!=null&&!baseResponseInfo.getErrCode().equals("0")) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(ShippingActivity.this, baseResponseInfo.getErrMsg(), Toast.LENGTH_SHORT).show();
-                                    mBinding.edShippingOrderSn.setText("");
-                                    mLoadingView.dismiss();
-                                }
-                            });
-                        }else{
-                            runOnUiThread(new Runnable() {
+                ApiResponse apiResponse=  ApiService.post("/Data/ParsebarcodeMT")
+                        .addParam("instockNo",params[0])
+                        .addParam("inStockNumber",params[1])
+                        .addParam("sumQty",params[2])
+                        .addParam("stockNo",params[3])
+                        .addParam("position",params[4])
+                        .responseType(new TypeReference<BaseResponseInfo>(){}.getType())
+                        .execute();
 
-                                @Override
-                                public void run() {
-                                    Toast.makeText(ShippingActivity .this,baseResponseInfo.getErrMsg(),Toast.LENGTH_SHORT).show();
-                                    mBinding.edShippingOrderSn.setText("");
-                                    mLoadingView.dismiss();
-                                }
-                            });
-                        }
-                    }
-                });
+                return apiResponse;
+            }
 
+            //在doInBackground 执行完成后，onPostExecute 方法将被UI 线程调用，
+            // 后台的计算结果将通过该方法传递到UI线程，并且在界面上展示给用户.
+            @Override
+            protected void onPostExecute(ApiResponse apiResponse) {
+                BaseResponseInfo responseInfo=null;
+
+                if(apiResponse!=null&&apiResponse.body!=null){
+                    responseInfo= (BaseResponseInfo) apiResponse.body;
+                }
+                mLoadingView.dismiss();
+                if(responseInfo==null||responseInfo.getErrCode().equals("0")){
+                    mBinding.edShippingOrderSn.setText("");
+                    Toast.makeText(ShippingActivity.this,responseInfo.getErrMsg(),Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Toast.makeText(ShippingActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
+                mBinding.edShippingOrderSn.setText("");
+
+            }
+        }.execute(params.get(0),params.get(1),params.get(2),params.get(3),params.get(4));
     }
 
     /***
@@ -240,40 +227,7 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
     public void onBarcodeEvent(BarcodeReadEvent event) {
         final String barcodeData = event.getBarcodeData();
         mLastModifyTime= event.getTimestamp();
-        Message message = new Message();
-        message.what = SCAN_OK;
-        Bundle bundle = new Bundle();
-        bundle.putString("barcode", barcodeData);
-        message.setData(bundle);
-        mHandler.sendMessage(message);
-
-//        if (Looper.myLooper() != Looper.getMainLooper()) {
-//            //切换到主进程
-//            Handler mainHandler = new Handler(Looper.getMainLooper());
-//            mainHandler.post(new Runnable() {
-//                @Override
-//                public void run() {
-//                    mEdShippingOrderSn.setText(barcodeData);
-//                    insertShipping(barcodeData);
-//                }
-//            });
-//        }else{
-//            ShippingActivity.this.runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    mEdShippingOrderSn.setText(barcodeData);
-//                    final IGlobalCallback<String> callback = CallbackManager
-//                            .getInstance()
-//                            .getCallback(CallbackType.ON_SCAN_SHIPPING_PACK);
-//                    if (callback != null) {
-//                        callback.executeCallback(barcodeData);
-//                    }
-//
-//                }
-//            });
-//        }
-
-
+        mEdShippingOrderSn.setText(barcodeData);
     }
 
     @Override

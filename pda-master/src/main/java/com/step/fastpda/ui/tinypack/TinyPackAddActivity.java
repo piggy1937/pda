@@ -4,6 +4,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -29,9 +31,6 @@ import com.step.fastpda.ui.login.UserManager;
 import com.step.fastpda.utils.NetworkDetector;
 import com.step.fastpda.utils.StatusBar;
 import com.step.fastpda.view.LoadingView;
-import com.tech.libcommon.global.CallbackManager;
-import com.tech.libcommon.global.CallbackType;
-import com.tech.libcommon.global.IGlobalCallback;
 import com.tech.libnetwork.ApiResponse;
 import com.tech.libnetwork.ApiService;
 import com.tech.libnetwork.JsonCallback;
@@ -95,14 +94,28 @@ public class TinyPackAddActivity extends AppCompatActivity implements BarcodeRea
         mLoadingView = new LoadingView(this, R.style.CustomDialog);
         mEdPackingSn = findViewById(R.id.ed_packing_sn);
         mEdPackingQuantity = findViewById(R.id.ed_packing_quantity);
-        CallbackManager.getInstance()
-                .addCallback(CallbackType.ON_SCAN_TINY_PACK, new IGlobalCallback<String>() {
-                    @Override
-                    public void executeCallback(@Nullable String barcode) {
+        mEdPackingSn.addTextChangedListener(new TextWatcher() {
 
-                        insertTinyPack(barcode);
-                    }
-                });
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String param= editable.toString();
+                if(!param.isEmpty()&&param.length()>0) {
+                    mEdPackingSn.removeTextChangedListener(this);
+                    insertTinyPack(param);
+                    mEdPackingSn.addTextChangedListener(this);
+                }
+            }
+        } );
 
     }
 
@@ -147,38 +160,8 @@ public class TinyPackAddActivity extends AppCompatActivity implements BarcodeRea
     public void onBarcodeEvent(BarcodeReadEvent event) {
         final String barcodeData = event.getBarcodeData();
         mLastModifyTime = event.getTimestamp();
-        if (Looper.myLooper() != Looper.getMainLooper()) {
-            //切换到主进程
-            Handler mainHandler = new Handler(Looper.getMainLooper());
-
-            mainHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mEdPackingSn.setText(barcodeData);
-                    insertTinyPack(barcodeData);
-
-                }
-            });
-
-        }else{
-            TinyPackAddActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mEdPackingSn.setText(barcodeData);
-                    final IGlobalCallback<String> callback = CallbackManager
-                            .getInstance()
-                            .getCallback(CallbackType.ON_SCAN_TINY_PACK);
-                    if (callback != null) {
-                        callback.executeCallback(barcodeData);
-                    }
-
-                }
-            });
-
-        }
-
-
-
+        mEdPackingSn.setText(barcodeData);
+       //
     }
 
     @Override
@@ -287,7 +270,7 @@ public class TinyPackAddActivity extends AppCompatActivity implements BarcodeRea
                                     mBinding.edPackingQuantity.setText("0");
                                     mBinding.edPackingSn.setText("");
                                     mBinding.edPackingSn.requestFocus();
-                                    mLoadingView.dismiss();
+                                   mLoadingView.dismiss();
                                 }
                             });
                         } else {
