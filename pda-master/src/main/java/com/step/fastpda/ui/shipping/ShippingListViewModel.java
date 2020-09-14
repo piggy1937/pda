@@ -1,5 +1,7 @@
 package com.step.fastpda.ui.shipping;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 import androidx.paging.ItemKeyedDataSource;
@@ -60,7 +62,11 @@ public class ShippingListViewModel extends AbsViewModel<ShippingList> {
         }
         SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
         Integer pageSize = 10;
-        Integer pageIndex=(offset+pageSize)/pageSize;
+        Integer pageIndex=(offset)/pageSize+1;
+        if(pageIndex==0){
+            pageIndex=1;
+        }
+        Log.d("###########",pageIndex+"");
         ApiResponse<ShippingResponseInfo> response = ApiService.get("/Data/GetBarcodemt")
 //                .addParam("creater", UserManager.get().getUserId())
 //                .addParam("RwDate",sdf.format(new Date()))
@@ -90,12 +96,13 @@ public class ShippingListViewModel extends AbsViewModel<ShippingList> {
         }
 
 
+
         if (requestKey > 0) {
             loadAfter.set(false);
-            offset += result.size();
+            offset += result.size()<pageSize?pageSize:result.size();
             ((MutableLiveData) getBoundaryPageData()).postValue(result.size() > 0);
         } else {
-            offset = result.size();
+            offset = result.size()<pageSize?pageSize:result.size();
         }
     }
 

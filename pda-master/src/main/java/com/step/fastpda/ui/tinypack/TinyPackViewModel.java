@@ -64,7 +64,7 @@ public class TinyPackViewModel extends AbsViewModel<TinyPackList> {
         }
         SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
         Integer pageSize = 10;
-        Integer pageIndex=(offset+pageSize)/pageSize;
+        Integer pageIndex=(offset)/pageSize+1;
         ApiResponse<TinyPackResponseInfo> response = ApiService.get("/Data/GetBarcode")
                 .addParam("pageSize", pageSize)
 //                .addParam("RwDate",sdf.format(new Date()))
@@ -93,10 +93,10 @@ public class TinyPackViewModel extends AbsViewModel<TinyPackList> {
         }
         if (requestKey > 0) {
             loadAfter.set(false);
-            offset += result.size();
+            offset += result.size()<pageSize?pageSize:result.size();
             ((MutableLiveData) getBoundaryPageData()).postValue(result.size() > 0);
         } else {
-            offset = result.size();
+            offset =  result.size()<pageSize?pageSize:result.size();
         }
     }
 }
