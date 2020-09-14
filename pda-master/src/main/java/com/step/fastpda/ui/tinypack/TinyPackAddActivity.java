@@ -1,5 +1,6 @@
 package com.step.fastpda.ui.tinypack;
 
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,6 +29,7 @@ import com.step.fastpda.R;
 import com.step.fastpda.databinding.ActivityLayoutTinypackAddBinding;
 import com.step.fastpda.ui.login.BaseResponseInfo;
 import com.step.fastpda.ui.login.UserManager;
+import com.step.fastpda.ui.shipping.ShippingActivity;
 import com.step.fastpda.utils.NetworkDetector;
 import com.step.fastpda.utils.StatusBar;
 import com.step.fastpda.view.LoadingView;
@@ -91,7 +93,7 @@ public class TinyPackAddActivity extends AppCompatActivity implements BarcodeRea
                 initBarcodeReader(mBarcodeReader);
             }
         });
-        mLoadingView = new LoadingView(this, R.style.CustomDialog);
+        mLoadingView = new LoadingView(TinyPackAddActivity.this, R.style.CustomDialog);
         mEdPackingSn = findViewById(R.id.ed_packing_sn);
         mEdPackingQuantity = findViewById(R.id.ed_packing_quantity);
         mEdPackingSn.addTextChangedListener(new TextWatcher() {
@@ -249,65 +251,49 @@ public class TinyPackAddActivity extends AppCompatActivity implements BarcodeRea
         } catch (Exception e) {
             e.printStackTrace();
         }
+        mLoadingView.show();
+        new AsyncTask<String, Void, ApiResponse>() {
+            //该方法运行在后台线程中，因此不能在该线程中更新UI，UI线程为主线程
+            @Override
+            protected ApiResponse doInBackground(String... params) {
 
-        ApiService.post("/Data/parsebarcode")
-                .addParam("barcode", barcode)
-                .addParam("txtSL", txtSL)
-                .addParam("creator", creator)
-                .addParam("type", type)
-                .responseType(new TypeReference<BaseResponseInfo>() {
-                }.getType())
-                .execute(new JsonCallback<BaseResponseInfo>() {
-                    @Override
-                    public void onSuccess(ApiResponse<BaseResponseInfo> response) {
-                        super.onSuccess(response);
-                        BaseResponseInfo baseResponseInfo = response.body != null ? response.body : null;
-                        if (baseResponseInfo != null && baseResponseInfo.getErrCode().equals("1")) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(TinyPackAddActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
-                                    mBinding.edPackingQuantity.setText("0");
-                                    mBinding.edPackingSn.setText("");
-                                    mBinding.edPackingSn.requestFocus();
-                                   mLoadingView.dismiss();
-                                }
-                            });
-                        } else {
-                            if (baseResponseInfo != null) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(TinyPackAddActivity.this, baseResponseInfo.getErrMsg(), Toast.LENGTH_SHORT).show();
-                                        mBinding.edPackingQuantity.setText("0");
-                                        mBinding.edPackingSn.setText("");
-                                        mBinding.edPackingSn.requestFocus();
-                                        mLoadingView.dismiss();
-                                    }
-                                });
-                            }
-                        }
+                ApiResponse apiResponse= ApiService.post("/Data/parsebarcode")
+                        .addParam("barcode", params[0])
+                        .addParam("txtSL",  params[1])
+                        .addParam("creator",  params[2])
+                        .addParam("type",  params[3])
+                        .responseType(new TypeReference<BaseResponseInfo>() {
+                        }.getType())
+                        .execute();
 
-                    }
+                return apiResponse;
+            }
 
-                    @Override
-                    public void onError(ApiResponse<BaseResponseInfo> response) {
-                        super.onError(response);
-                        BaseResponseInfo baseResponseInfo = response.body != null ? response.body : null;
-                        if (baseResponseInfo != null && !baseResponseInfo.getErrCode().equals("0")) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(TinyPackAddActivity.this, baseResponseInfo.getErrMsg(), Toast.LENGTH_SHORT).show();
-                                    mBinding.edPackingQuantity.setText("0");
-                                    mBinding.edPackingSn.setText("");
-                                    mBinding.edPackingSn.requestFocus();
-                                    mLoadingView.dismiss();
-                                }
-                            });
-                        }
-                    }
-                });
+            //在doInBackground 执行完成后，onPostExecute 方法将被UI 线程调用，
+            // 后台的计算结果将通过该方法传递到UI线程，并且在界面上展示给用户.
+            @Override
+            protected void onPostExecute(ApiResponse apiResponse) {
+                BaseResponseInfo responseInfo=null;
+
+                if(apiResponse!=null&&apiResponse.body!=null){
+                    responseInfo= (BaseResponseInfo) apiResponse.body;
+                }
+                mLoadingView.dismiss();
+                if(responseInfo==null||responseInfo.getErrCode().equals("0")){
+                    mBinding.edPackingQuantity.setText("0");
+                    mBinding.edPackingSn.setText("");
+                    mBinding.edPackingSn.requestFocus();
+                    Toast.makeText(TinyPackAddActivity.this,responseInfo.getErrMsg(),Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Toast.makeText(TinyPackAddActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
+                mBinding.edPackingQuantity.setText("0");
+                mBinding.edPackingSn.setText("");
+                mBinding.edPackingSn.requestFocus();
+            }
+        }.execute(barcode,txtSL,creator,type);
+
+
 
 
     }

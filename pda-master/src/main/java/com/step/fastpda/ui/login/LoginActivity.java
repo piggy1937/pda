@@ -155,10 +155,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             protected void onPostExecute(ApiResponse apiResponse) {
                 BaseResponseInfo responseInfo=null;
 
+                mLoadingView.dismiss();
                 if(apiResponse!=null&&apiResponse.body!=null){
                     responseInfo= (BaseResponseInfo) apiResponse.body;
+                }else if(!apiResponse.success){
+                    Toast.makeText(LoginActivity.this,apiResponse.message,Toast.LENGTH_SHORT).show();
+                    return;
                 }
-                mLoadingView.dismiss();
+
                 if(responseInfo==null||responseInfo.getErrCode().equals("0")){
                     Toast.makeText(LoginActivity.this,"用户名密码错误",Toast.LENGTH_SHORT).show();
                     return;
