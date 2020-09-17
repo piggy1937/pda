@@ -171,15 +171,15 @@ public class ShippingActivity extends AppCompatActivity implements  BarcodeReade
                 }
                 mLoadingView.dismiss();
                 if(responseInfo==null||responseInfo.getErrCode().equals("0")){
-                    mBinding.edShippingOrderSn.setText("");
+                    mEdShippingOrderSn.setText("");
                     Toast.makeText(ShippingActivity.this,responseInfo.getErrMsg(),Toast.LENGTH_SHORT).show();
                     return;
                 }
                 Toast.makeText(ShippingActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
-                mBinding.edShippingOrderSn.setText("");
+                mEdShippingOrderSn.setText("");
 
             }
-        }.execute(params.get(0),params.get(1),params.get(2),params.get(3),params.get(4));
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,params.get(0),params.get(1),params.get(2),params.get(3),params.get(4));
     }
 
     /***

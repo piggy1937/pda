@@ -29,13 +29,11 @@ import com.step.fastpda.R;
 import com.step.fastpda.databinding.ActivityLayoutTinypackAddBinding;
 import com.step.fastpda.ui.login.BaseResponseInfo;
 import com.step.fastpda.ui.login.UserManager;
-import com.step.fastpda.ui.shipping.ShippingActivity;
 import com.step.fastpda.utils.NetworkDetector;
 import com.step.fastpda.utils.StatusBar;
 import com.step.fastpda.view.LoadingView;
 import com.tech.libnetwork.ApiResponse;
 import com.tech.libnetwork.ApiService;
-import com.tech.libnetwork.JsonCallback;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -291,7 +289,7 @@ public class TinyPackAddActivity extends AppCompatActivity implements BarcodeRea
                 mBinding.edPackingSn.setText("");
                 mBinding.edPackingSn.requestFocus();
             }
-        }.execute(barcode,txtSL,creator,type);
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,barcode,txtSL,creator,type);
 
 
 
