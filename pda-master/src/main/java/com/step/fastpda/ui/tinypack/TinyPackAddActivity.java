@@ -77,6 +77,7 @@ public class TinyPackAddActivity extends AppCompatActivity implements BarcodeRea
             setResult(RESULT_CODE);
             finish();
         });
+        mBinding.edPackingSn.requestFocus();
 
 
 //        mBinding.btnTinyPackSubmit.setOnClickListener(e -> {
@@ -158,9 +159,13 @@ public class TinyPackAddActivity extends AppCompatActivity implements BarcodeRea
 
     @Override
     public void onBarcodeEvent(BarcodeReadEvent event) {
-        final String barcodeData = event.getBarcodeData();
-        mLastModifyTime = event.getTimestamp();
-        mEdPackingSn.setText(barcodeData);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                final String barcodeData = event.getBarcodeData();
+                mLastModifyTime = event.getTimestamp();
+                mEdPackingSn.setText(barcodeData);
+            }});
        //
     }
 
@@ -242,6 +247,16 @@ public class TinyPackAddActivity extends AppCompatActivity implements BarcodeRea
             type = "attach";
         }
         String txtSL = mEdPackingQuantity.getText().toString();
+//        try {
+//            int quantity=Integer.parseInt(txtSL);
+//
+//            if(quantity<1){
+//                mEdPackingQuantity.setError("数量不允许为空");
+//                return;
+//            }
+//        } catch (NumberFormatException e) {
+//            e.printStackTrace();
+//        }
         mLoadingView.show();
         String creator = "";
         try {
