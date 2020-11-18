@@ -66,6 +66,9 @@
     <string name="save">保存</string>
     <string name="text_bar">标签号</string>
     <string name="text_number">数量</string>
+    <string name="fun_attach">补货单</string>
+    <string name="attach_type_0">读码补货</string>
+    <string name="attach_type_1">包装补货</string>
 
     <string-array name="profile_tabs">
         <item>动态</item>

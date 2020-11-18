@@ -23,7 +23,7 @@ import com.tech.libnavannotation.FragmentDestination;
  * email： 604580436@qq.com
  * description：
  */
-@FragmentDestination(pageUrl = "main/tabs/shipping")
+@FragmentDestination(pageUrl = "main/tabs/shipping",needLogin = true)
 public class ShippingFragment extends AbsListFragment<ShippingList,ShippingListViewModel> {
     private static final int REQUEST_CODE = 100;
     @Override

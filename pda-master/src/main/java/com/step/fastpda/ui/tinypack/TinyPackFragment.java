@@ -23,7 +23,7 @@ import com.tech.libnavannotation.FragmentDestination;
  * email： 604580436@qq.com
  * description： 小包标签
  */
-@FragmentDestination(pageUrl = "main/tabs/tiny")
+@FragmentDestination(pageUrl = "main/tabs/tiny",needLogin = true)
 public class TinyPackFragment extends AbsListFragment2<TinyPackList,TinyPackViewModel> {
     private static final int REQUEST_CODE = 100;
     @Override

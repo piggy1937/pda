@@ -23,6 +23,12 @@
       "index": 2,
       "pageUrl": "main/tabs/my",
       "title": "我的"
+    },{
+      "size": 24,
+      "enable": true,
+      "index": 2,
+      "pageUrl": "main/tabs/attach",
+      "title": "补打"
     }
   ]
 }

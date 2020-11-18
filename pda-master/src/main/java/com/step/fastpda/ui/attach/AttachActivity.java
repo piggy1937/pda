@@ -1,4 +1,4 @@
-package com.step.fastpda.ui.shipping;
+package com.step.fastpda.ui.attach;
 
 import android.os.AsyncTask;
 import android.os.Build;
@@ -11,6 +11,8 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -18,7 +20,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.alibaba.fastjson.TypeReference;
-import com.google.common.base.Splitter;
 import com.honeywell.aidc.AidcManager;
 import com.honeywell.aidc.BarcodeFailureEvent;
 import com.honeywell.aidc.BarcodeReadEvent;
@@ -28,32 +29,37 @@ import com.honeywell.aidc.ScannerUnavailableException;
 import com.honeywell.aidc.TriggerStateChangeEvent;
 import com.honeywell.aidc.UnsupportedPropertyException;
 import com.step.fastpda.R;
-import com.step.fastpda.databinding.ActivityLayoutShippingAddBinding;
+import com.step.fastpda.databinding.ActivityLayoutAttachAddBinding;
 import com.step.fastpda.ui.login.BaseResponseInfo;
 import com.step.fastpda.utils.NetworkDetector;
 import com.step.fastpda.utils.StatusBar;
 import com.step.fastpda.view.LoadingView;
+import com.tech.libnavannotation.ActivityDestination;
 import com.tech.libnetwork.ApiResponse;
 import com.tech.libnetwork.ApiService;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
  * @author zhushubin
- * @date 2020-08-14.
+ * @date 2020-11-18.
  * GitHub：
  * email： 604580436@qq.com
- * description：
+ * description： 补打
  */
-public class ShippingActivity extends AppCompatActivity implements BarcodeReader.BarcodeListener, BarcodeReader.TriggerListener {
+@ActivityDestination(pageUrl = "main/tabs/attach",needLogin = true)
+public class AttachActivity extends AppCompatActivity implements BarcodeReader.BarcodeListener, BarcodeReader.TriggerListener {
     private static final int RESULT_CODE = 200;
-    private ActivityLayoutShippingAddBinding mBinding;
+    private ActivityLayoutAttachAddBinding mBinding;
     private BarcodeReader mBarcodeReader;
     private String mLastModifyTime;
     private LoadingView mLoadingView;//加载dailog
-    private EditText mEdShippingOrderSn;
+    private EditText mEdAttachOrderSn;//编号
+    private EditText mEdAttachQuantity;//数量
+    private RadioGroup mRgAttachType;//单选框组
+    private RadioButton mRb0, mRb1;
+    private volatile String mType="0";
     private final static int SCAN_OK = 0;
     private Handler mHandler = new Handler() {
         public void handleMessage(Message msg) {
@@ -61,8 +67,8 @@ public class ShippingActivity extends AppCompatActivity implements BarcodeReader
                 case SCAN_OK:
                     Bundle bundle = msg.getData();
                     String barcode = bundle.getString("barcode");
-                    mEdShippingOrderSn.setText(barcode);
-                    insertShipping(barcode);
+                    mEdAttachOrderSn.setText(barcode);
+                    insertAttach(barcode);
                     break;
             }
             super.handleMessage(msg);
@@ -85,16 +91,34 @@ public class ShippingActivity extends AppCompatActivity implements BarcodeReader
 
 
         StatusBar.lightStatusBar(this, false);
-        mBinding = ActivityLayoutShippingAddBinding.inflate(LayoutInflater.from(this));
+        mBinding = ActivityLayoutAttachAddBinding.inflate(LayoutInflater.from(this));
         setContentView(mBinding.getRoot());
-        mEdShippingOrderSn = findViewById(R.id.ed_shipping_order_sn);
-        //关闭对话框
-        mBinding.iconShippingClose.setOnClickListener(e -> {
-            setResult(RESULT_CODE);
-            finish();
-        });
-        mBinding.edShippingOrderSn.requestFocus();
-        mEdShippingOrderSn.addTextChangedListener(new TextWatcher() {
+        mEdAttachOrderSn = findViewById(R.id.ed_attach_order_sn);
+        mEdAttachQuantity = findViewById(R.id.ed_attach_quantity);
+        mRgAttachType=   findViewById(R.id.attach_rg_type);
+        mRb0=   findViewById(R.id.attach_rb_0);
+        mRb1=   findViewById(R.id.attach_rb_0);
+        //补货类型
+        mRgAttachType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener(){
+
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
+                switch (checkedId) {
+                    case R.id.attach_rb_0:
+                        // 当用户选择读码补货时
+                        mType="0";
+                        break;
+                    case R.id.attach_rb_1:
+                        // 当用户包装补货时
+                        mType="1";
+                        break;
+                }
+            }
+        } );
+
+
+        mBinding.edAttachOrderSn.requestFocus();
+        mEdAttachOrderSn.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -109,15 +133,15 @@ public class ShippingActivity extends AppCompatActivity implements BarcodeReader
             public void afterTextChanged(Editable editable) {
                 String param = editable.toString();
                 if (!param.isEmpty() && param.length() > 0) {
-                    mEdShippingOrderSn.removeTextChangedListener(this);
-                    insertShipping(param);
-                    mEdShippingOrderSn.addTextChangedListener(this);
+                    mEdAttachOrderSn.removeTextChangedListener(this);
+                    insertAttach(param);
+                    mEdAttachOrderSn.addTextChangedListener(this);
 
                 }
             }
         });
 
-        mLoadingView = new LoadingView(ShippingActivity.this, R.style.CustomDialog);
+        mLoadingView = new LoadingView(AttachActivity.this, R.style.CustomDialog);
         AidcManager.create(this, new AidcManager.CreatedCallback() {
 
             @Override
@@ -131,31 +155,40 @@ public class ShippingActivity extends AppCompatActivity implements BarcodeReader
     }
 
     /***
-     * 新增小包标签
+     * 新增补货单
      */
-    private void insertShipping(String mParam) {
+    private void insertAttach(String barcode) {
 
         if (!NetworkDetector.detect(this)) {
-            Toast.makeText(ShippingActivity.this, "当期网络不可用，请稍后再试", Toast.LENGTH_SHORT).show();
+            Toast.makeText(AttachActivity.this, "当期网络不可用，请稍后再试", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (mParam.isEmpty()) {
-            Toast.makeText(ShippingActivity.this, "参数错误", Toast.LENGTH_SHORT).show();
+        if (barcode.isEmpty()) {
+            Toast.makeText(AttachActivity.this, "参数错误", Toast.LENGTH_SHORT).show();
             return;
         }
-        List<String> params = Splitter.on("%").splitToList(mParam);
+        String tstSl="";
+        try {
+            tstSl=mEdAttachQuantity.getText().toString();
+            if(Integer.parseInt(tstSl)<1){
+                Toast.makeText(AttachActivity.this, "数量不允许为空", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+
+
         mLoadingView.show();
         new AsyncTask<String, Void, ApiResponse>() {
             //该方法运行在后台线程中，因此不能在该线程中更新UI，UI线程为主线程
             @Override
             protected ApiResponse doInBackground(String... params) {
 
-                ApiResponse apiResponse = ApiService.post("/Data/ParsebarcodeMT")
-                        .addParam("instockNo", params[0])
-                        .addParam("inStockNumber", params[1])
-                        .addParam("sumQty", params[2])
-                        .addParam("stockNo", params[3])
-                        .addParam("position", params[4])
+                ApiResponse apiResponse = ApiService.post("/Data/AddReUpBill")
+                        .addParam("barcode", params[0])
+                        .addParam("txtSL", params[1])
+                        .addParam("type", params[2])
                         .responseType(new TypeReference<BaseResponseInfo>() {
                         }.getType())
                         .execute();
@@ -174,15 +207,15 @@ public class ShippingActivity extends AppCompatActivity implements BarcodeReader
                 }
                 mLoadingView.dismiss();
                 if (responseInfo == null || responseInfo.getErrCode().equals("0")) {
-                    mEdShippingOrderSn.setText("");
-                    Toast.makeText(ShippingActivity.this, responseInfo.getErrMsg(), Toast.LENGTH_SHORT).show();
+                    mEdAttachOrderSn.setText("");
+                    Toast.makeText(AttachActivity.this, responseInfo.getErrMsg(), Toast.LENGTH_SHORT).show();
                     return;
                 }
-                Toast.makeText(ShippingActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
-                mEdShippingOrderSn.setText("");
+                Toast.makeText(AttachActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
+                mEdAttachOrderSn.setText("");
 
             }
-        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, params.get(0), params.get(1), params.get(2), params.get(3), params.get(4));
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, barcode,  tstSl, mType);
     }
 
     /***
@@ -233,7 +266,7 @@ public class ShippingActivity extends AppCompatActivity implements BarcodeReader
             public void run() {
                 final String barcodeData = event.getBarcodeData();
                 mLastModifyTime = event.getTimestamp();
-                mEdShippingOrderSn.setText(barcodeData);
+                mEdAttachOrderSn.setText(barcodeData);
             }
         });
     }
