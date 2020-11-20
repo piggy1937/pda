@@ -1,5 +1,7 @@
 package com.tech.libnetwork;
 
+import android.util.Log;
+
 import com.alibaba.fastjson.JSONObject;
 
 import okhttp3.MediaType;
@@ -20,6 +22,7 @@ public class PostRequest<T> extends Request<T, PostRequest> {
 ////            bodyBuilder.add(entry.getKey(), String.valueOf(entry.getValue()));
 ////        }
         String json = JSONObject.toJSONString(params);
+        Log.e("aa",json);
         RequestBody body = RequestBody.create(JSON, json);
         okhttp3.Request request = builder.url(mUrl).post(body).build();
         return request;

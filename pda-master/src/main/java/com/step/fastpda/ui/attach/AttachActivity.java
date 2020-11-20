@@ -3,9 +3,7 @@ package com.step.fastpda.ui.attach;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -61,24 +59,10 @@ public class AttachActivity extends AppCompatActivity implements BarcodeReader.B
     private RadioButton mRb0, mRb1;
     private volatile String mType="0";
     private final static int SCAN_OK = 0;
-    private Handler mHandler = new Handler() {
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case SCAN_OK:
-                    Bundle bundle = msg.getData();
-                    String barcode = bundle.getString("barcode");
-                    mEdAttachOrderSn.setText(barcode);
-                    insertAttach(barcode);
-                    break;
-            }
-            super.handleMessage(msg);
-        }
-    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             View decorView = getWindow().getDecorView();
             int option = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
@@ -93,11 +77,17 @@ public class AttachActivity extends AppCompatActivity implements BarcodeReader.B
         StatusBar.lightStatusBar(this, false);
         mBinding = ActivityLayoutAttachAddBinding.inflate(LayoutInflater.from(this));
         setContentView(mBinding.getRoot());
+        mBinding.iconAttachClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
         mEdAttachOrderSn = findViewById(R.id.ed_attach_order_sn);
         mEdAttachQuantity = findViewById(R.id.ed_attach_quantity);
         mRgAttachType=   findViewById(R.id.attach_rg_type);
         mRb0=   findViewById(R.id.attach_rb_0);
-        mRb1=   findViewById(R.id.attach_rb_0);
+        mRb1=   findViewById(R.id.attach_rb_1);
         //补货类型
         mRgAttachType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener(){
 
@@ -206,9 +196,13 @@ public class AttachActivity extends AppCompatActivity implements BarcodeReader.B
                     responseInfo = (BaseResponseInfo) apiResponse.body;
                 }
                 mLoadingView.dismiss();
-                if (responseInfo == null || responseInfo.getErrCode().equals("0")) {
+                if (responseInfo == null || (responseInfo !=null&&responseInfo.getErrCode().equals("0"))) {
                     mEdAttachOrderSn.setText("");
-                    Toast.makeText(AttachActivity.this, responseInfo.getErrMsg(), Toast.LENGTH_SHORT).show();
+                    String message="操作失败";
+                    if(responseInfo!=null){
+                        message = responseInfo.getErrMsg();
+                    }
+                    Toast.makeText(AttachActivity.this, message, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 Toast.makeText(AttachActivity.this, "操作成功", Toast.LENGTH_SHORT).show();

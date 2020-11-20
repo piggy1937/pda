@@ -21,14 +21,14 @@
       "size": 24,
       "enable": true,
       "index": 2,
-      "pageUrl": "main/tabs/my",
-      "title": "我的"
+      "pageUrl": "main/tabs/attach",
+      "title": "补打"
     },{
       "size": 24,
       "enable": true,
-      "index": 2,
-      "pageUrl": "main/tabs/attach",
-      "title": "补打"
+      "index": 3,
+      "pageUrl": "main/tabs/my",
+      "title": "我的"
     }
   ]
 }

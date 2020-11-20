@@ -27,7 +27,7 @@ import java.util.List;
  * description：
  */
 public class AppBottomBar extends BottomNavigationView {
-    private static int[] sIcons = new int[]{R.drawable.icon_tab_home, R.drawable.icon_tab_sofa,R.drawable.icon_tab_mine, R.drawable.icon_tab_publish, R.drawable.icon_tab_find};
+    private static int[] sIcons = new int[]{R.drawable.icon_tab_home, R.drawable.icon_tab_sofa, R.drawable.icon_tab_find,R.drawable.icon_tab_mine};
     private BottomBar config;
 
     public AppBottomBar(Context context) {
